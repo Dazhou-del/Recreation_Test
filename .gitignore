@@ -1,0 +1,13 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.o
+*.dylib
+*.DS_Store
+*.vscode
+*.test
+*.out
+log/
+

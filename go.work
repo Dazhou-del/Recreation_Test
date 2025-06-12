@@ -1,0 +1,13 @@
+go 1.24
+
+use (
+	common
+	config
+	connector
+	core
+	framework
+	game
+	gate
+	hall
+	user
+)
