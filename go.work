@@ -10,4 +10,5 @@ use (
 	gate
 	hall
 	user
+	utils
 )

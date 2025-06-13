@@ -16,7 +16,6 @@ type Server struct {
 }
 
 func (s Server) BuildRegisterKey() string {
-
 	if len(s.Version) == 0 {
 		// user
 		return fmt.Sprintf("/%s/%s", s.Name, s.Addr)
@@ -35,18 +34,18 @@ func ParseValue(v []byte) (Server, error) {
 
 func ParseKey(key string) (Server, error) {
 	// user/v1/127.0.0.1:12000 user/127.0.0.1:12000
-	strs := strings.Split(key, "/")
-	if len(strs) == 2 {
+	strList := strings.Split(key, "/")
+	if len(strList) == 2 {
 		return Server{
-			Name: strs[0],
-			Addr: strs[1],
+			Name: strList[0],
+			Addr: strList[1],
 		}, nil
 	}
-	if len(strs) == 3 {
+	if len(strList) == 3 {
 		return Server{
-			Name:    strs[0],
-			Addr:    strs[2],
-			Version: strs[1],
+			Name:    strList[0],
+			Addr:    strList[2],
+			Version: strList[1],
 		}, nil
 	}
 	return Server{}, errors.New("invalid key")

@@ -1,0 +1,63 @@
+package config
+
+import (
+	"go.uber.org/zap/zapcore"
+	"time"
+)
+
+// Levels 根据字符串转化为 zapcore.Levels
+func (c *Zap) Levels() []zapcore.Level {
+	levels := make([]zapcore.Level, 0, 7)
+	level, err := zapcore.ParseLevel(c.Level)
+
+	if err != nil {
+		level = zapcore.DebugLevel
+	}
+
+	for ; level <= zapcore.FatalLevel; level++ {
+		levels = append(levels, level)
+	}
+
+	return levels
+}
+
+// Encoder 日志编码器
+func (c *Zap) Encoder() zapcore.Encoder {
+	config := zapcore.EncoderConfig{
+		TimeKey:       "time",
+		NameKey:       "name",
+		LevelKey:      "level",
+		CallerKey:     "caller",
+		MessageKey:    "message",
+		StacktraceKey: c.StacktraceKey,
+		LineEnding:    zapcore.DefaultLineEnding,
+		EncodeTime: func(t time.Time, encoder zapcore.PrimitiveArrayEncoder) {
+			encoder.AppendString(c.Prefix + t.Format("2006-01-02 15:04:05.000"))
+		},
+		EncodeLevel:    c.LevelEncoder(),
+		EncodeCaller:   zapcore.FullCallerEncoder,
+		EncodeDuration: zapcore.SecondsDurationEncoder,
+	}
+
+	if c.Format == "json" {
+		return zapcore.NewJSONEncoder(config)
+	}
+
+	return zapcore.NewConsoleEncoder(config)
+}
+
+// LevelEncoder 根据 EncodeLevel 返回 zapcore.LevelEncoder
+func (c *Zap) LevelEncoder() zapcore.LevelEncoder {
+	switch {
+	case c.EncodeLevel == "LowercaseLevelEncoder": // 小写编码器(默认)
+		return zapcore.LowercaseLevelEncoder
+	case c.EncodeLevel == "LowercaseColorLevelEncoder": // 小写编码器带颜色
+		return zapcore.LowercaseColorLevelEncoder
+	case c.EncodeLevel == "CapitalLevelEncoder": // 大写编码器
+		return zapcore.CapitalLevelEncoder
+	case c.EncodeLevel == "CapitalColorLevelEncoder": // 大写编码器带颜色
+		return zapcore.CapitalColorLevelEncoder
+	default:
+		return zapcore.LowercaseLevelEncoder
+	}
+}

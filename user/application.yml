@@ -1,7 +1,15 @@
 metricPort: 5854
 appName: user
 log:
-  level: DEBUG
+  level: info # info error warn
+  format: console # console 有颜色  json 无颜色
+  prefix: "[test/dazhou]"
+  director: log
+  show-line: true
+  encode-level: LowercaseColorLevelEncoder
+  stacktrace-key: stacktrace
+  log-in-console: true
+  retention-day: -1
 grpc:
   addr: 127.0.0.1:11500
 etcd:
@@ -15,16 +23,16 @@ etcd:
     ttl: 10
 db:
   mongo:
-    url: mongodb://127.0.0.1:27018
+    url: mongodb://localhost:27017
     userName: root
-    password: root123456
+    password: 123456
     minPoolSize: 10
     maxPoolSize: 100
-    db: msqp
+    db: base
   redis:
-    addr: 127.0.0.1:6379
+    addr: localhost:6379
     poolSize: 10
-    minIdleConns: 1
+    minIdleConnList: 1
     password:
 jwt:
   secret: 123456
