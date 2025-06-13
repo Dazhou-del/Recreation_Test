@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-const Prefix = "MSQP"
+const Prefix = "recreation_test"
 const AccountIdRedisKey = "AccountId"
 const AccountIdBegin = 10000
 

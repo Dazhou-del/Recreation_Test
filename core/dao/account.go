@@ -4,6 +4,9 @@ import (
 	"context"
 	"core/models/entity"
 	"core/repo"
+	"errors"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type AccountDao struct {
@@ -17,6 +20,24 @@ func (d *AccountDao) SaveAccount(ctx context.Context, ac *entity.Account) error 
 		return err
 	}
 	return nil
+}
+
+func (d *AccountDao) FindAccount(ctx context.Context, account string) (*entity.Account, error) {
+	db := d.repo.Mongo.Db.Collection("account")
+	result := db.FindOne(ctx, bson.D{
+		{"account", account},
+	})
+
+	ac := new(entity.Account)
+	err := result.Decode(ac)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return ac, nil
 }
 
 func NewAccountDao(m *repo.Manager) *AccountDao {

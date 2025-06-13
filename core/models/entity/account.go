@@ -13,4 +13,5 @@ type Account struct {
 	PhoneAccount string             `bson:"phoneAccount"`
 	WxAccount    string             `bson:"wxAccount"`
 	CreateTime   time.Time          `bson:"createTime"`
+	RoleList     []string           `bson:"roleList"`
 }

@@ -27,7 +27,7 @@ func (r Resolver) Build(target resolver.Target, cc resolver.ClientConn, opts res
 	// 获取到调用的key（user/v1）连接etcd 获取其value
 	r.cc = cc
 
-	//建立etcd的连接
+	// 建立etcd的连接
 	var err error
 	r.etcdCli, err = clientv3.New(clientv3.Config{
 		Endpoints:   r.conf.AddrList,

@@ -92,6 +92,7 @@ func (x *RegisterParams) GetSmsCode() string {
 type RegisterResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Uid           string                 `protobuf:"bytes,1,opt,name=uid,proto3" json:"uid,omitempty"`
+	RoleList      []string               `protobuf:"bytes,2,rep,name=roleList,proto3" json:"roleList,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -133,6 +134,13 @@ func (x *RegisterResponse) GetUid() string {
 	return ""
 }
 
+func (x *RegisterResponse) GetRoleList() []string {
+	if x != nil {
+		return x.RoleList
+	}
+	return nil
+}
+
 var File_user_proto protoreflect.FileDescriptor
 
 const file_user_proto_rawDesc = "" +
@@ -143,9 +151,10 @@ const file_user_proto_rawDesc = "" +
 	"\aaccount\x18\x01 \x01(\tR\aaccount\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\x12$\n" +
 	"\rloginPlatform\x18\x03 \x01(\x05R\rloginPlatform\x12\x18\n" +
-	"\asmsCode\x18\x04 \x01(\tR\asmsCode\"$\n" +
+	"\asmsCode\x18\x04 \x01(\tR\asmsCode\"@\n" +
 	"\x10RegisterResponse\x12\x10\n" +
-	"\x03uid\x18\x01 \x01(\tR\x03uid2=\n" +
+	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x1a\n" +
+	"\broleList\x18\x02 \x03(\tR\broleList2=\n" +
 	"\vUserService\x12.\n" +
 	"\bRegister\x12\x0f.RegisterParams\x1a\x11.RegisterResponseB\fZ\n" +
 	"user/pb;pbb\x06proto3"

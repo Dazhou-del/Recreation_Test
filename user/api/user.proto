@@ -9,6 +9,7 @@ message RegisterParams{
 
 message RegisterResponse{
   string uid = 1;
+  repeated string roleList = 2;
 }
 
 service UserService{

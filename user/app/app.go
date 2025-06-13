@@ -36,7 +36,7 @@ func Run(ctx context.Context) error {
 			logs.Log.Fatal("user grpc server register etcd err", zap.Error(err))
 		}
 
-		pb.RegisterUserServiceServer(server, service.NewAccountService(manager, ctx))
+		pb.RegisterUserServiceServer(server, service.NewAccountService(manager))
 
 		// 阻塞操作
 		err = server.Serve(lis)
