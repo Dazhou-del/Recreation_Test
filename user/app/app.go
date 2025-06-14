@@ -3,13 +3,13 @@ package app
 import (
 	"common/config"
 	"common/discovery"
+	"common/interceptor"
 	"common/logs"
 	"context"
 	"core/repo"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"net"
-	"user/interceptor"
 	"user/internal/service"
 	"user/pb"
 )
@@ -22,7 +22,7 @@ func Run(ctx context.Context) error {
 	server := grpc.NewServer(
 		// 添加验证中间件，校验服务调用的安全信息
 		// 如果需要添加多个则使用ChainUnaryInterceptor
-		grpc.UnaryInterceptor(interceptor.GrpcAuthUnaryServerInterceptor()),
+		grpc.ChainUnaryInterceptor(interceptor.GrpcAuthUnaryServerInterceptor(), interceptor.GrpcLogUnaryServerInterceptor()),
 		// 添加Stream API的拦截器
 		grpc.StreamInterceptor(interceptor.GrpcAuthStreamServerInterceptor()),
 	)

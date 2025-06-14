@@ -10,5 +10,5 @@ use (
 	gate
 	hall
 	user
-	utils
+	./common/utils
 )

@@ -2,10 +2,10 @@ package router
 
 import (
 	"common/config"
+	middleware "common/middleware"
 	"common/rpc"
 	"gate/api"
 	"gate/enum"
-	"gate/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,6 +23,8 @@ func RegisterRouter() *gin.Engine {
 	r := gin.Default()
 	// CorsByRules 按照配置的规则放行跨域请求
 	r.Use(middleware.CorsByRules())
+	// 日志中间件
+	r.Use(middleware.NewLogM().RequestLogMiddleware())
 	// 注册用户接口
 	userHandler := api.NewUserHandler()
 	r.POST("/register", userHandler.Register)

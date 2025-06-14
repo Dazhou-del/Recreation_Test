@@ -2,12 +2,14 @@ package service
 
 import (
 	"common/biz"
+	"common/logs"
 	"context"
 	"core/dao"
 	"core/models/entity"
 	"core/models/requests"
 	"core/repo"
 	"framework/msError"
+	"go.uber.org/zap"
 	"time"
 	"user/pb"
 )
@@ -54,13 +56,16 @@ func (a *AccountService) wxRegister(ctx context.Context, req *pb.RegisterParams)
 	// 需要生成几个数字做为用户的唯一id  redis自增
 	uid, err := a.redisDao.NextAccountId()
 	if err != nil {
+		logs.Log.WithContext(ctx).Error("NextAccountId failed err:", zap.Error(err))
+
 		return ac, biz.SqlError
 	}
 
 	ac.Uid = uid
 	err = a.accountDao.SaveAccount(ctx, ac)
-
 	if err != nil {
+		logs.Log.WithContext(ctx).Error("SaveAccount failed err:", zap.Error(err))
+
 		return ac, biz.SqlError
 	}
 

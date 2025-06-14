@@ -3,6 +3,8 @@ package api
 import (
 	"common/biz"
 	"common/config"
+	"utils/method"
+
 	jwts "common/jwts"
 	"common/logs"
 	common "common/result"
@@ -26,11 +28,12 @@ func (u *UserHandler) Register(ctx *gin.Context) {
 	err := ctx.ShouldBind(&req)
 	if err != nil {
 		common.Fail(ctx, biz.RequestDataError)
+
 		return
 	}
 
 	// 调用user rpc注册用户
-	response, err := rpc.UserClient.Register(ctx, &req)
+	response, err := rpc.UserClient.Register(method.GetTranceIdCtx(ctx), &req)
 	if err != nil {
 		common.Fail(ctx, msError.ToError(err))
 

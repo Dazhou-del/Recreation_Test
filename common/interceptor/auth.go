@@ -56,7 +56,7 @@ func (a *grpcAuthor) Auth(
 	// 从上下文中获取认证信息
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return nil, fmt.Errorf("ctx is not an grpc incoming context!")
+		return nil, fmt.Errorf("ctx is not an grpc incoming service")
 	}
 
 	// 获取客户端凭证信息
@@ -81,7 +81,7 @@ func (a *grpcAuthor) StreamAuth(
 	// 从上下文中获取认证信息
 	md, ok := metadata.FromIncomingContext(ss.Context())
 	if !ok {
-		return fmt.Errorf("ctx is not an grpc incoming context")
+		return fmt.Errorf("ctx is not an grpc incoming service")
 	}
 
 	fmt.Println("grpc header info ：", md)

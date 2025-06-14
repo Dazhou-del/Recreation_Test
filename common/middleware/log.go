@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"bytes"
+	"common/enum"
 	"common/logs"
 	"github.com/google/uuid"
 	"io"
@@ -20,15 +21,12 @@ func NewLogM() *LogM {
 	return &LogM{}
 }
 
-func (m *LogM) Handler() gin.HandlerFunc {
+func (m *LogM) RequestLogMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		if strings.HasPrefix(ctx.Request.URL.String(), "/crmebimage") {
-			ctx.Next()
-			return
-		}
 		start := time.Now()
 		trace := uuid.NewString()
-		logs.Log.WithValue(ctx, zap.String("trace", trace))
+		logs.Log.WithValue(ctx, zap.String(enum.TraceId, trace))
+		ctx.Set(enum.TraceId, trace)
 
 		ctx.Next()
 		requestParams := m.getRequestParams(ctx)

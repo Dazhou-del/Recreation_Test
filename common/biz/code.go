@@ -49,4 +49,5 @@ var (
 	RoomNotExist                = msError.NewError(308, errors.New("房间不存在"))
 	CanNotEnterNotLocation      = msError.NewError(309, errors.New("无法进入房间，获取定位信息失败"))
 	CanNotEnterTooNear          = msError.NewError(310, errors.New("无法进入房间，与房间中的其他玩家太近"))
+	GetTraceIdCtx               = msError.NewError(311, errors.New("获取带traceId的ctx失败"))
 )

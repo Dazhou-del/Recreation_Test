@@ -2,6 +2,7 @@ package logs
 
 import (
 	"common/config"
+	"common/enum"
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -11,8 +12,6 @@ import (
 	"time"
 	"utils/idirectory"
 )
-
-const ctxLoggerKey = "zapLogger"
 
 var Log *Logger
 
@@ -52,25 +51,29 @@ func timeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 	enc.AppendString(t.Format("2006-01-02 15:04:05.000"))
 }
 
-// WithValue Adds a field to the specified context
+// WithValue Adds a field to the specified service
 func (l *Logger) WithValue(ctx context.Context, fields ...zapcore.Field) context.Context {
 	if c, ok := ctx.(*gin.Context); ok {
 		ctx = c.Request.Context()
-		c.Request = c.Request.WithContext(context.WithValue(ctx, ctxLoggerKey, l.WithContext(ctx).With(fields...)))
+		c.Request = c.Request.WithContext(context.WithValue(ctx, enum.CtxLoggerKey, l.WithContext(ctx).With(fields...)))
 		return c
 	}
-	return context.WithValue(ctx, ctxLoggerKey, l.WithContext(ctx).With(fields...))
+	return context.WithValue(ctx, enum.CtxLoggerKey, l.WithContext(ctx).With(fields...))
 }
 
-// WithContext Returns a zap instance from the specified context
+// WithContext Returns a zap instance from the specified service
 func (l *Logger) WithContext(ctx context.Context) *Logger {
 	if c, ok := ctx.(*gin.Context); ok {
 		ctx = c.Request.Context()
 	}
-	zl := ctx.Value(ctxLoggerKey)
+	zl := ctx.Value(enum.CtxLoggerKey)
 	ctxLogger, ok := zl.(*zap.Logger)
 	if ok {
 		return &Logger{ctxLogger}
 	}
 	return l
+}
+
+func (l *Logger) WithTraceId(ctx context.Context, traceID string) context.Context {
+	return l.WithValue(ctx, zap.String(enum.TraceId, traceID))
 }
