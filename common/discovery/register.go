@@ -153,6 +153,7 @@ func (r *Register) watcher(ctx context.Context) {
 					return
 				}
 			}
+
 			logs.Log.Info("unregister etcd...")
 		case res := <-r.keepAliveCh:
 			// 如果etcd重启了 相当于连接断开 需要进行重新连接 res==nil

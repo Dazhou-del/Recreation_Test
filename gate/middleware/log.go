@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"bytes"
-	"crmeb_go/utils/izap"
+	"common/logs"
 	"github.com/google/uuid"
 	"io"
 	"net/http"
@@ -13,7 +13,14 @@ import (
 	"time"
 )
 
-func ZapLog() gin.HandlerFunc {
+type LogM struct {
+}
+
+func NewLogM() *LogM {
+	return &LogM{}
+}
+
+func (m *LogM) Handler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		if strings.HasPrefix(ctx.Request.URL.String(), "/crmebimage") {
 			ctx.Next()
@@ -21,13 +28,13 @@ func ZapLog() gin.HandlerFunc {
 		}
 		start := time.Now()
 		trace := uuid.NewString()
-		izap.Log.WithValue(ctx, zap.String("trace", trace))
+		logs.Log.WithValue(ctx, zap.String("trace", trace))
 
 		ctx.Next()
-		requestParams := getRequestParams(ctx)
+		requestParams := m.getRequestParams(ctx)
 		method := ctx.Request.Method
 
-		izap.Log.WithContext(ctx).Info("Request",
+		logs.Log.WithContext(ctx).Info("Request",
 			zap.String("request_method", method),
 			zap.String("request_url", ctx.Request.URL.String()),
 			zap.String("client_ip", ctx.ClientIP()),
@@ -38,7 +45,7 @@ func ZapLog() gin.HandlerFunc {
 	}
 }
 
-func getRequestParams(ctx *gin.Context) string {
+func (m *LogM) getRequestParams(ctx *gin.Context) string {
 	method := ctx.Request.Method
 
 	// 准备一个变量来存所有请求参数的字符串

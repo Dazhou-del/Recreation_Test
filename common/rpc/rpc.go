@@ -4,6 +4,7 @@ import (
 	"common/config"
 	"common/discovery"
 	"common/logs"
+	"context"
 	"fmt"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -15,6 +16,36 @@ import (
 var (
 	UserClient pb.UserServiceClient
 )
+
+type Authentication struct {
+	clientId     string
+	clientSecret string
+}
+
+func NewAuthentication(clientId, clientSecret string) *Authentication {
+	return &Authentication{
+		clientId:     clientId,
+		clientSecret: clientSecret,
+	}
+}
+
+func (a *Authentication) withClientCredentials(clientId, clientSecret string) {
+	a.clientId = clientId
+	a.clientSecret = clientSecret
+}
+
+// GetRequestMetadata 从meta中获取凭证信息
+func (a *Authentication) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) {
+	return map[string]string{
+		"client_id":     a.clientId,
+		"client_secret": a.clientSecret,
+	}, nil
+}
+
+// RequireTransportSecurity 指示凭据是否需要传输安全性。
+func (a *Authentication) RequireTransportSecurity() bool {
+	return false
+}
 
 func Init() {
 	// etcd解析器 就可以grpc连接的时候 进行触，通过提供的地址 去etcd中寻找
@@ -32,6 +63,7 @@ func initClient(name string, loadBalance bool, client interface{}) {
 	// 传输层不需要TLS，禁用安全传输
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithPerRPCCredentials(NewAuthentication(config.Conf.Grpc.ClientId, config.Conf.Grpc.ClientSecret)),
 	}
 
 	// 如果启用了负载均衡 (loadBalance)，则在选项中添加了默认服务配置，设置负载均衡策略为 "round_robin"（轮询算法）

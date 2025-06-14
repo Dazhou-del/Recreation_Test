@@ -99,15 +99,17 @@ type EtcdConf struct {
 }
 
 type RegisterServer struct {
-	Addr    string `mapstructure:"addr" json:"addr"`
-	Name    string `mapstructure:"name" json:"name"`
-	Version string `mapstructure:"version" json:"version"`
-	Weight  int    `mapstructure:"weight" json:"weight"`
-	Ttl     int64  `mapstructure:"ttl" json:"ttl"` // 租约时长
+	Addr    string `mapstructure:"addr" json:"addr"`       // 地址
+	Name    string `mapstructure:"name" json:"name"`       // 名称
+	Version string `mapstructure:"version" json:"version"` // 版本
+	Weight  int    `mapstructure:"weight" json:"weight"`   // 权重
+	Ttl     int64  `mapstructure:"ttl" json:"ttl"`         // 租约时长
 }
 
 type GrpcConf struct {
-	Addr string `mapstructure:"addr" json:"addr"`
+	Addr         string `mapstructure:"addr" json:"addr"`                 // 地址
+	ClientId     string `mapstructure:"clientId" json:"clientId"`         // 客服端ID(用于服务端校验)
+	ClientSecret string `mapstructure:"clientSecret" json:"clientSecret"` // 客户端密钥(用于服务端校验)
 }
 
 // InitConfig 加载配置

@@ -21,6 +21,8 @@ func Run(ctx context.Context) error {
 		if err := r.Run(fmt.Sprintf(":%d", config.Conf.HttpPort)); err != nil {
 			logs.Log.Fatal("gate gin run err", zap.Error(err))
 		}
+
+		fmt.Println("http server run", "localhost:", config.Conf.HttpPort)
 	}()
 
 	return nil

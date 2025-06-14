@@ -88,6 +88,7 @@ func (r Resolver) sync() error {
 
 		return nil
 	}
+
 	err = r.cc.UpdateState(resolver.State{
 		Addresses: r.srvAddrList,
 	})
@@ -128,7 +129,7 @@ func (r Resolver) update(events []*clientv3.Event) {
 	for _, ev := range events {
 		switch ev.Type {
 		case clientv3.EventTypePut:
-			//put key value
+			// put key value
 			server, err := ParseValue(ev.Kv.Value)
 			if err != nil {
 				logs.Log.Error("grpc client update(EventTypePut) parse etcd value failed", zap.Any("name", r.key), zap.Error(err))
