@@ -29,14 +29,12 @@ func NewMongo(ctx context.Context) *MongoManager {
 	if err != nil {
 		logs.Log.Fatal("mongo connect ", zap.Error(err))
 		panic(err)
-		return nil
 	}
 
 	if err := client.Ping(ctx, readpref.Primary()); err != nil {
 		logs.Log.Fatal("mongo ping  ", zap.Error(err))
 		panic(err)
 
-		return nil
 	}
 
 	m := &MongoManager{

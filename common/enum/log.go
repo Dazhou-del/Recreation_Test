@@ -1,3 +1,6 @@
 package enum
 
-const CtxLoggerKey = "zapLogger"
+type loggerKey struct{}
+
+// CtxLoggerKey ContextKey
+var CtxLoggerKey = loggerKey{}

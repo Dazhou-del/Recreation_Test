@@ -24,9 +24,7 @@ func (d *AccountDao) SaveAccount(ctx context.Context, ac *entity.Account) error 
 
 func (d *AccountDao) FindAccount(ctx context.Context, account string) (*entity.Account, error) {
 	db := d.repo.Mongo.Db.Collection("account")
-	result := db.FindOne(ctx, bson.D{
-		{"account", account},
-	})
+	result := db.FindOne(ctx, bson.D{{Key: "account", Value: account}})
 
 	ac := new(entity.Account)
 	err := result.Decode(ac)

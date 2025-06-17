@@ -48,14 +48,14 @@ func (c *Zap) Encoder() zapcore.Encoder {
 
 // LevelEncoder 根据 EncodeLevel 返回 zapcore.LevelEncoder
 func (c *Zap) LevelEncoder() zapcore.LevelEncoder {
-	switch {
-	case c.EncodeLevel == "LowercaseLevelEncoder": // 小写编码器(默认)
+	switch c.EncodeLevel {
+	case "LowercaseLevelEncoder": // 小写编码器(默认)
 		return zapcore.LowercaseLevelEncoder
-	case c.EncodeLevel == "LowercaseColorLevelEncoder": // 小写编码器带颜色
+	case "LowercaseColorLevelEncoder": // 小写编码器带颜色
 		return zapcore.LowercaseColorLevelEncoder
-	case c.EncodeLevel == "CapitalLevelEncoder": // 大写编码器
+	case "CapitalLevelEncoder": // 大写编码器
 		return zapcore.CapitalLevelEncoder
-	case c.EncodeLevel == "CapitalColorLevelEncoder": // 大写编码器带颜色
+	case "CapitalColorLevelEncoder": // 大写编码器带颜色
 		return zapcore.CapitalColorLevelEncoder
 	default:
 		return zapcore.LowercaseLevelEncoder

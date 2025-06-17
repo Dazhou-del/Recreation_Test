@@ -16,9 +16,10 @@ import (
 // 过了租约时间，etcd就会删除grpc服务信息
 // 实现心跳，完成续租，如果etcd没有 就新注册
 type Register struct {
-	etcdCli     *clientv3.Client                        // etcd连接
-	leaseId     clientv3.LeaseID                        // 租约id
-	DialTimeout int                                     // 超时时间
+	etcdCli     *clientv3.Client // etcd连接
+	leaseId     clientv3.LeaseID // 租约id
+	DialTimeout int              // 超时时间
+	// nolint
 	ttl         int                                     // 租约时间
 	keepAliveCh <-chan *clientv3.LeaseKeepAliveResponse // 心跳
 	info        Server                                  // 注册的server信息

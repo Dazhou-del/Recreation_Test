@@ -122,18 +122,18 @@ func InitConfig(confFile string) {
 		log.Println("配置文件被修改了")
 		err := v.Unmarshal(&Conf)
 		if err != nil {
-			panic(fmt.Errorf("Unmarshal change config data,err:%v \n", err))
+			panic(fmt.Errorf("failed to unmarshal changed config data: %v", err))
 		}
 	})
 
 	err := v.ReadInConfig()
 	if err != nil {
-		panic(fmt.Errorf("读取配置文件出错,err:%v \n", err))
+		panic(fmt.Errorf("读取配置文件出错,err:%v", err))
 	}
 
 	//解析
 	err = v.Unmarshal(&Conf)
 	if err != nil {
-		panic(fmt.Errorf("Unmarshal config data,err:%v \n", err))
+		panic(fmt.Errorf("unmarshal config data,err:%v", err))
 	}
 }

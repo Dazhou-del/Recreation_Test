@@ -5,10 +5,14 @@ import (
 	"common/discovery"
 	"common/interceptor"
 	"common/logs"
+	"common/tracing"
 	"context"
 	"core/repo"
+	grpc_opentracing "github.com/grpc-ecosystem/go-grpc-middleware/tracing/opentracing"
+	"github.com/opentracing/opentracing-go"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"io"
 	"net"
 	"user/internal/service"
 	"user/pb"
@@ -18,14 +22,27 @@ import (
 func Run(ctx context.Context) error {
 	// 初始化日志库
 	logs.NewZap(config.Conf.Log)
+
+	tracer, closer := tracing.Init("cartService")
+	defer func(closer io.Closer) {
+		err := closer.Close()
+		if err != nil {
+			logs.Log.Error("tracing closer err", zap.Error(err))
+		}
+	}(closer)
+	opentracing.SetGlobalTracer(tracer)
+
 	// 启动grpc服务端
 	server := grpc.NewServer(
 		// 添加验证中间件，校验服务调用的安全信息
 		// 如果需要添加多个则使用ChainUnaryInterceptor
-		grpc.ChainUnaryInterceptor(interceptor.GrpcAuthUnaryServerInterceptor(), interceptor.GrpcLogUnaryServerInterceptor()),
+		grpc.ChainUnaryInterceptor(interceptor.GrpcAuthUnaryServerInterceptor(), interceptor.GrpcLogUnaryServerInterceptor(),
+			grpc_opentracing.UnaryServerInterceptor()), // 链路追踪拦截器
+
 		// 添加Stream API的拦截器
 		grpc.StreamInterceptor(interceptor.GrpcAuthStreamServerInterceptor()),
 	)
+
 	// 注册 grpc service 需要数据库 mongo redis
 	// 初始化 数据库管理
 	manager := repo.New(ctx)

@@ -39,7 +39,7 @@ func (a *grpcAuthor) validateServiceCredential(clientId, clientSecret string) er
 		return status.Errorf(codes.Unauthenticated, "client_id or client_secret is \"\"")
 	}
 
-	if !(clientId == "admin" && clientSecret == "123456") {
+	if clientId != "admin" || clientSecret != "123456" {
 		return status.Errorf(codes.Unauthenticated, "client_id or client_secret invalidate")
 	}
 

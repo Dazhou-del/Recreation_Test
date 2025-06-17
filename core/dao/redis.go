@@ -1,9 +1,11 @@
 package dao
 
 import (
+	"common/logs"
 	"context"
 	"core/repo"
 	"fmt"
+	"go.uber.org/zap"
 )
 
 const Prefix = "recreation_test"
@@ -28,8 +30,18 @@ func (d *RedisDao) incr(key string) (string, error) {
 	// 0 代表不存在
 	if d.repo.Redis.Cli != nil {
 		exist, err = d.repo.Redis.Cli.Exists(todo, key).Result()
+		if err != nil {
+			logs.Log.Error("Redis.Cli Exists err:", zap.Error(err), zap.String("key", key))
+
+			return "", err
+		}
 	} else {
 		exist, err = d.repo.Redis.ClusterCli.Exists(todo, key).Result()
+		if err != nil {
+			logs.Log.Error("Redis.ClusterCli Exists err:", zap.Error(err), zap.String("key", key))
+
+			return "", err
+		}
 	}
 
 	if exist == 0 {
@@ -39,7 +51,10 @@ func (d *RedisDao) incr(key string) (string, error) {
 		} else {
 			err = d.repo.Redis.ClusterCli.Set(todo, key, AccountIdBegin, 0).Err()
 		}
+
 		if err != nil {
+			logs.Log.Error("Redis.Cli.Set err:", zap.Error(err), zap.String("key", key))
+
 			return "", err
 		}
 	}
@@ -52,6 +67,8 @@ func (d *RedisDao) incr(key string) (string, error) {
 	}
 
 	if err != nil {
+		logs.Log.Error("Redis Incr err:", zap.Error(err), zap.String("key", key))
+
 		return "", err
 	}
 

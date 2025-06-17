@@ -86,16 +86,18 @@ func main() {
 
 	// 启动服务
 	if err := s.Run(); err != nil {
-		logger.Error(err)
+		err := logger.Error(err)
+		if err != nil {
+			log.Println("run Error:", err)
+
+			return
+		}
 	}
 
 	// 处理错误
 	go func() {
-		for {
-			select {
-			case err := <-errs:
-				log.Println("Error:", err)
-			}
+		for err := range errs {
+			log.Println("Error:", err)
 		}
 	}()
 

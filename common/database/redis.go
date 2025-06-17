@@ -39,14 +39,12 @@ func NewRedis(ctx context.Context) *RedisManager {
 	if clusterCli != nil {
 		if err := clusterCli.Ping(ctx).Err(); err != nil {
 			panic(err)
-			return nil
 		}
 	}
 
 	if cli != nil {
 		if err := cli.Ping(ctx).Err(); err != nil {
 			panic(err)
-			return nil
 		}
 	}
 

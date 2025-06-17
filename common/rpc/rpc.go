@@ -6,6 +6,7 @@ import (
 	"common/logs"
 	"context"
 	"fmt"
+
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -29,6 +30,7 @@ func NewAuthentication(clientId, clientSecret string) *Authentication {
 	}
 }
 
+// withClientCredentials
 func (a *Authentication) withClientCredentials(clientId, clientSecret string) {
 	a.clientId = clientId
 	a.clientSecret = clientSecret
