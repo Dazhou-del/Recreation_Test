@@ -25,7 +25,7 @@ func RegisterRouter() *gin.Engine {
 	r.Use(middleware.CorsByRules())
 	// 日志中间件
 	r.Use(middleware.NewLogM().RequestLogMiddleware())
-	r.Use(middleware.Trace())
+	//r.Use(middleware.Trace())
 	// 注册用户接口
 	userHandler := api.NewUserHandler()
 	r.POST("/register", userHandler.Register)

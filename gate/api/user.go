@@ -3,6 +3,7 @@ package api
 import (
 	"common/biz"
 	"common/config"
+	"go.opentelemetry.io/otel"
 	"utils/method"
 
 	jwts "common/jwts"
@@ -21,6 +22,8 @@ type UserHandler struct {
 func NewUserHandler() *UserHandler {
 	return &UserHandler{}
 }
+
+var Tracer = otel.Tracer("api1")
 
 func (u *UserHandler) Register(ctx *gin.Context) {
 	// 接收参数
