@@ -141,6 +141,102 @@ func (x *RegisterResponse) GetRoleList() []string {
 	return nil
 }
 
+type SaveInternalCertificationParams struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ClientID      string                 `protobuf:"bytes,1,opt,name=clientID,proto3" json:"clientID,omitempty"`
+	ClientSecret  string                 `protobuf:"bytes,2,opt,name=clientSecret,proto3" json:"clientSecret,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SaveInternalCertificationParams) Reset() {
+	*x = SaveInternalCertificationParams{}
+	mi := &file_user_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SaveInternalCertificationParams) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SaveInternalCertificationParams) ProtoMessage() {}
+
+func (x *SaveInternalCertificationParams) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SaveInternalCertificationParams.ProtoReflect.Descriptor instead.
+func (*SaveInternalCertificationParams) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *SaveInternalCertificationParams) GetClientID() string {
+	if x != nil {
+		return x.ClientID
+	}
+	return ""
+}
+
+func (x *SaveInternalCertificationParams) GetClientSecret() string {
+	if x != nil {
+		return x.ClientSecret
+	}
+	return ""
+}
+
+type SaveInternalCertificationResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ClientID      string                 `protobuf:"bytes,1,opt,name=clientID,proto3" json:"clientID,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SaveInternalCertificationResponse) Reset() {
+	*x = SaveInternalCertificationResponse{}
+	mi := &file_user_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SaveInternalCertificationResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SaveInternalCertificationResponse) ProtoMessage() {}
+
+func (x *SaveInternalCertificationResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_user_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SaveInternalCertificationResponse.ProtoReflect.Descriptor instead.
+func (*SaveInternalCertificationResponse) Descriptor() ([]byte, []int) {
+	return file_user_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *SaveInternalCertificationResponse) GetClientID() string {
+	if x != nil {
+		return x.ClientID
+	}
+	return ""
+}
+
 var File_user_proto protoreflect.FileDescriptor
 
 const file_user_proto_rawDesc = "" +
@@ -154,9 +250,16 @@ const file_user_proto_rawDesc = "" +
 	"\asmsCode\x18\x04 \x01(\tR\asmsCode\"@\n" +
 	"\x10RegisterResponse\x12\x10\n" +
 	"\x03uid\x18\x01 \x01(\tR\x03uid\x12\x1a\n" +
-	"\broleList\x18\x02 \x03(\tR\broleList2=\n" +
+	"\broleList\x18\x02 \x03(\tR\broleList\"a\n" +
+	"\x1fSaveInternalCertificationParams\x12\x1a\n" +
+	"\bclientID\x18\x01 \x01(\tR\bclientID\x12\"\n" +
+	"\fclientSecret\x18\x02 \x01(\tR\fclientSecret\"?\n" +
+	"!SaveInternalCertificationResponse\x12\x1a\n" +
+	"\bclientID\x18\x01 \x01(\tR\bclientID2=\n" +
 	"\vUserService\x12.\n" +
-	"\bRegister\x12\x0f.RegisterParams\x1a\x11.RegisterResponseB\fZ\n" +
+	"\bRegister\x12\x0f.RegisterParams\x1a\x11.RegisterResponse2\x81\x01\n" +
+	"\x1cInternalCertificationService\x12a\n" +
+	"\x19SaveInternalCertification\x12 .SaveInternalCertificationParams\x1a\".SaveInternalCertificationResponseB\fZ\n" +
 	"user/pb;pbb\x06proto3"
 
 var (
@@ -171,16 +274,20 @@ func file_user_proto_rawDescGZIP() []byte {
 	return file_user_proto_rawDescData
 }
 
-var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_user_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_user_proto_goTypes = []any{
-	(*RegisterParams)(nil),   // 0: RegisterParams
-	(*RegisterResponse)(nil), // 1: RegisterResponse
+	(*RegisterParams)(nil),                    // 0: RegisterParams
+	(*RegisterResponse)(nil),                  // 1: RegisterResponse
+	(*SaveInternalCertificationParams)(nil),   // 2: SaveInternalCertificationParams
+	(*SaveInternalCertificationResponse)(nil), // 3: SaveInternalCertificationResponse
 }
 var file_user_proto_depIdxs = []int32{
 	0, // 0: UserService.Register:input_type -> RegisterParams
-	1, // 1: UserService.Register:output_type -> RegisterResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	2, // 1: InternalCertificationService.SaveInternalCertification:input_type -> SaveInternalCertificationParams
+	1, // 2: UserService.Register:output_type -> RegisterResponse
+	3, // 3: InternalCertificationService.SaveInternalCertification:output_type -> SaveInternalCertificationResponse
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -197,9 +304,9 @@ func file_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_proto_rawDesc), len(file_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
-			NumServices:   1,
+			NumServices:   2,
 		},
 		GoTypes:           file_user_proto_goTypes,
 		DependencyIndexes: file_user_proto_depIdxs,

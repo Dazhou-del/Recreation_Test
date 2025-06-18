@@ -11,7 +11,7 @@ var (
 	Fail                        = msError.NewError(1, errors.New("请求失败"))
 	RequestDataError            = msError.NewError(2, errors.New("请求数据错误"))
 	SqlError                    = msError.NewError(3, errors.New("数据库操作错误"))
-	InvalidUsers                = msError.NewError(4, errors.New("无效用户"))
+	InvalidUsersError           = msError.NewError(4, errors.New("无效用户"))
 	PermissionNotEnough         = msError.NewError(6, errors.New("权限不足"))
 	SmsCodeError                = msError.NewError(7, errors.New("短信验证码错误"))
 	ImgCodeError                = msError.NewError(8, errors.New("图形验证码错误")) // 图形验证码错误
@@ -50,4 +50,5 @@ var (
 	CanNotEnterNotLocation      = msError.NewError(309, errors.New("无法进入房间，获取定位信息失败"))
 	CanNotEnterTooNear          = msError.NewError(310, errors.New("无法进入房间，与房间中的其他玩家太近"))
 	GetTraceIdCtx               = msError.NewError(311, errors.New("获取带traceId的ctx失败"))
+	SaveInternalCertification   = msError.NewError(311, errors.New("保存内部rpc调用凭证错误"))
 )

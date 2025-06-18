@@ -6,8 +6,15 @@ import (
 	"net/http"
 )
 
-// Cors 直接放行所有跨域请求并放行所有 OPTIONS 方法
-func Cors() gin.HandlerFunc {
+type CorsH struct {
+}
+
+func NewCorsH() *CorsH {
+	return &CorsH{}
+}
+
+// CorsHandler 直接放行所有跨域请求并放行所有 OPTIONS 方法
+func (c *CorsH) CorsHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		method := c.Request.Method
 		origin := c.Request.Header.Get("Origin")
@@ -33,11 +40,11 @@ func Cors() gin.HandlerFunc {
 	}
 }
 
-// CorsByRules 按照配置处理跨域请求
-func CorsByRules() gin.HandlerFunc {
+// CorsByRulesHandler 按照配置处理跨域请求
+func (c *CorsH) CorsByRulesHandler() gin.HandlerFunc {
 	// 放行全部
 	if config.Conf.Cors.Mode == "allow-all" {
-		return Cors()
+		return c.CorsHandler()
 	}
 	return func(c *gin.Context) {
 		whitelist := checkCors(c.GetHeader("origin"))

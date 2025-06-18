@@ -56,5 +56,5 @@ cors:
       expose-headers: Content-Length, Access-Control-Allow-Origin, Access-Control-Allow-Headers, Content-Type
       allow-credentials: true # 布尔值
 grpc:
-  clientId: "admin"
-  clientSecret: "123456"
+  clientId: "gate"
+  clientSecret: "$2a$10$bSA2xAy9Zf47h.1RXQB5K.8YRZK85EX2QulLfrgCyt9kFE8HKCY/W"

@@ -21,10 +21,11 @@ func NewLogM() *LogM {
 	return &LogM{}
 }
 
-func (m *LogM) RequestLogMiddleware() gin.HandlerFunc {
+func (m *LogM) Handler() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		start := time.Now()
 		trace := uuid.NewString()
+
 		logs.Log.WithValue(ctx, zap.String(enum.TraceId, trace))
 		ctx.Set(enum.TraceId, trace)
 

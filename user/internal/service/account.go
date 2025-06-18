@@ -9,7 +9,6 @@ import (
 	"core/models/requests"
 	"core/repo"
 	"framework/msError"
-	"go.opentelemetry.io/otel"
 	"go.uber.org/zap"
 	"time"
 	"user/pb"
@@ -29,8 +28,6 @@ func NewAccountService(manager *repo.Manager) *AccountService {
 		redisDao:   dao.NewRedisDao(manager),
 	}
 }
-
-var Tracer = otel.Tracer("api2")
 
 func (a *AccountService) Register(ctx context.Context, req *pb.RegisterParams) (*pb.RegisterResponse, error) {
 	// 写注册的业务逻辑

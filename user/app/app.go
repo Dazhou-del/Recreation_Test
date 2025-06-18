@@ -6,6 +6,7 @@ import (
 	"common/interceptor"
 	"common/logs"
 	"context"
+	"core/dao"
 	"core/repo"
 	"user/internal/service"
 
@@ -20,19 +21,19 @@ func Run(ctx context.Context) error {
 	// 初始化日志库
 	logs.NewZap(config.Conf.Log)
 
+	// 初始化数据库管理
+	manager := repo.New(ctx)
+
 	// 初始化 gRPC 服务
 	server := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
-			interceptor.GrpcAuthUnaryServerInterceptor(),
+			interceptor.GrpcAuthUnaryServerInterceptor(dao.NewInternalCertificationDao(manager)),
 			interceptor.GrpcLogUnaryServerInterceptor(),
 		),
 		grpc.ChainStreamInterceptor(
-			interceptor.GrpcAuthStreamServerInterceptor(),
+			interceptor.GrpcAuthStreamServerInterceptor(dao.NewInternalCertificationDao(manager)),
 		),
 	)
-
-	// 初始化数据库管理
-	manager := repo.New(ctx)
 
 	// 启动 gRPC 服务监听协程
 	go func() {
@@ -50,6 +51,7 @@ func Run(ctx context.Context) error {
 
 		// 注册 gRPC 服务实现
 		pb.RegisterUserServiceServer(server, service.NewAccountService(manager))
+		pb.RegisterInternalCertificationServiceServer(server, service.NewInternalCertificationService(manager))
 
 		// 启动 gRPC 服务
 		if err := server.Serve(lis); err != nil {

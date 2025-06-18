@@ -22,13 +22,18 @@ func RegisterRouter() *gin.Engine {
 
 	r := gin.Default()
 	// CorsByRules 按照配置的规则放行跨域请求
-	r.Use(middleware.CorsByRules())
+	r.Use(middleware.NewCorsH().CorsByRulesHandler())
 	// 日志中间件
-	r.Use(middleware.NewLogM().RequestLogMiddleware())
+	r.Use(middleware.NewLogM().Handler())
 	//r.Use(middleware.Trace())
+	r.Use(middleware.NewRecoveryM().Handler())
 	// 注册用户接口
 	userHandler := api.NewUserHandler()
 	r.POST("/register", userHandler.Register)
+
+	// 注册内部rpc调用认证接口
+	certificationHandler := api.NewInternalCertificationHandler()
+	r.POST("/saveInternalCertification", certificationHandler.SaveInternalCertification)
 
 	return r
 }

@@ -15,7 +15,8 @@ import (
 )
 
 var (
-	UserClient pb.UserServiceClient
+	UserClient                         pb.UserServiceClient
+	InternalCertificationServiceClient pb.InternalCertificationServiceClient
 )
 
 type Authentication struct {
@@ -56,6 +57,7 @@ func Init() {
 	userDomain := config.Conf.Domain["user"]
 
 	initClient(userDomain.Name, userDomain.LoadBalance, &UserClient)
+	initClient(userDomain.Name, userDomain.LoadBalance, &InternalCertificationServiceClient)
 }
 
 func initClient(name string, loadBalance bool, client interface{}) {
@@ -82,6 +84,8 @@ func initClient(name string, loadBalance bool, client interface{}) {
 	switch c := client.(type) {
 	case *pb.UserServiceClient:
 		*c = pb.NewUserServiceClient(conn)
+	case *pb.InternalCertificationServiceClient:
+		*c = pb.NewInternalCertificationServiceClient(conn)
 	default:
 		logs.Log.Fatal("unsupported client type")
 	}

@@ -119,3 +119,106 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "user.proto",
 }
+
+const (
+	InternalCertificationService_SaveInternalCertification_FullMethodName = "/InternalCertificationService/SaveInternalCertification"
+)
+
+// InternalCertificationServiceClient is the client API for InternalCertificationService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type InternalCertificationServiceClient interface {
+	SaveInternalCertification(ctx context.Context, in *SaveInternalCertificationParams, opts ...grpc.CallOption) (*SaveInternalCertificationResponse, error)
+}
+
+type internalCertificationServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewInternalCertificationServiceClient(cc grpc.ClientConnInterface) InternalCertificationServiceClient {
+	return &internalCertificationServiceClient{cc}
+}
+
+func (c *internalCertificationServiceClient) SaveInternalCertification(ctx context.Context, in *SaveInternalCertificationParams, opts ...grpc.CallOption) (*SaveInternalCertificationResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SaveInternalCertificationResponse)
+	err := c.cc.Invoke(ctx, InternalCertificationService_SaveInternalCertification_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// InternalCertificationServiceServer is the server API for InternalCertificationService service.
+// All implementations must embed UnimplementedInternalCertificationServiceServer
+// for forward compatibility.
+type InternalCertificationServiceServer interface {
+	SaveInternalCertification(context.Context, *SaveInternalCertificationParams) (*SaveInternalCertificationResponse, error)
+	mustEmbedUnimplementedInternalCertificationServiceServer()
+}
+
+// UnimplementedInternalCertificationServiceServer must be embedded to have
+// forward compatible implementations.
+//
+// NOTE: this should be embedded by value instead of pointer to avoid a nil
+// pointer dereference when methods are called.
+type UnimplementedInternalCertificationServiceServer struct{}
+
+func (UnimplementedInternalCertificationServiceServer) SaveInternalCertification(context.Context, *SaveInternalCertificationParams) (*SaveInternalCertificationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SaveInternalCertification not implemented")
+}
+func (UnimplementedInternalCertificationServiceServer) mustEmbedUnimplementedInternalCertificationServiceServer() {
+}
+func (UnimplementedInternalCertificationServiceServer) testEmbeddedByValue() {}
+
+// UnsafeInternalCertificationServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to InternalCertificationServiceServer will
+// result in compilation errors.
+type UnsafeInternalCertificationServiceServer interface {
+	mustEmbedUnimplementedInternalCertificationServiceServer()
+}
+
+func RegisterInternalCertificationServiceServer(s grpc.ServiceRegistrar, srv InternalCertificationServiceServer) {
+	// If the following call pancis, it indicates UnimplementedInternalCertificationServiceServer was
+	// embedded by pointer and is nil.  This will cause panics if an
+	// unimplemented method is ever invoked, so we test this at initialization
+	// time to prevent it from happening at runtime later due to I/O.
+	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
+		t.testEmbeddedByValue()
+	}
+	s.RegisterService(&InternalCertificationService_ServiceDesc, srv)
+}
+
+func _InternalCertificationService_SaveInternalCertification_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SaveInternalCertificationParams)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InternalCertificationServiceServer).SaveInternalCertification(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InternalCertificationService_SaveInternalCertification_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InternalCertificationServiceServer).SaveInternalCertification(ctx, req.(*SaveInternalCertificationParams))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// InternalCertificationService_ServiceDesc is the grpc.ServiceDesc for InternalCertificationService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var InternalCertificationService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "InternalCertificationService",
+	HandlerType: (*InternalCertificationServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "SaveInternalCertification",
+			Handler:    _InternalCertificationService_SaveInternalCertification_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "user.proto",
+}
