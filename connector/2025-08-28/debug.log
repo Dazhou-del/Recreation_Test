@@ -1,0 +1,16 @@
+2025-08-28 16:10:16.337	debug	WebSocket connection attempt from 	{"remoteAddr": "[::1]:65444", "UserAgent": "Apifox/1.0.0 (https://apifox.com)"}
+2025-08-28 16:10:16.338	debug	WebSocket connection established	{"client.Cid": "6c7d2298-5749-428a-84b8-a8f80b69128c-connector-001-10001", "from remoteAddr": "[::1]:65444"}
+2025-08-28 16:10:42.683	debug	WebSocket connection attempt from 	{"remoteAddr": "[::1]:51060", "UserAgent": "Apifox/1.0.0 (https://apifox.com)"}
+2025-08-28 16:10:42.683	debug	WebSocket connection established	{"client.Cid": "a271474b-a037-49fe-82d4-4834424bc3b4-connector-001-10002", "from remoteAddr": "[::1]:51060"}
+2025-08-28 16:11:08.145	debug	WebSocket connection attempt from 	{"remoteAddr": "[::1]:58224", "UserAgent": "Apifox/1.0.0 (https://apifox.com)"}
+2025-08-28 16:11:08.148	debug	WebSocket connection established	{"client.Cid": "ab5b6e4d-dd66-40bf-a0cf-f7727d6db42d-connector-001-10003", "from remoteAddr": "[::1]:58224"}
+2025-08-28 16:13:48.158	debug	WebSocket connection attempt from 	{"remoteAddr": "[::1]:62196", "UserAgent": "Apifox/1.0.0 (https://apifox.com)"}
+2025-08-28 16:13:48.159	debug	WebSocket connection established	{"client.Cid": "d4113af8-7c0d-413f-b640-bbb4589d6ffd-connector-001-10001", "from remoteAddr": "[::1]:62196"}
+2025-08-28 16:14:50.475	debug	WebSocket connection attempt from 	{"remoteAddr": "[::1]:59922", "UserAgent": "Apifox/1.0.0 (https://apifox.com)"}
+2025-08-28 16:14:50.476	debug	WebSocket connection established	{"client.Cid": "cc1b2c51-6276-4d6a-816e-d960fa92574d-connector-001-10002", "from remoteAddr": "[::1]:59922"}
+2025-08-28 16:15:37.379	debug	WebSocket connection attempt from 	{"remoteAddr": "[::1]:61478", "UserAgent": "Apifox/1.0.0 (https://apifox.com)"}
+2025-08-28 16:15:37.380	debug	WebSocket connection established	{"client.Cid": "1ba827bb-2e38-444f-bda9-4347747a0676-connector-001-10003", "from remoteAddr": "[::1]:61478"}
+2025-08-28 16:18:06.999	debug	WebSocket connection attempt from 	{"remoteAddr": "[::1]:64130", "UserAgent": "Apifox/1.0.0 (https://apifox.com)"}
+2025-08-28 16:18:30.454	debug	WebSocket connection established	{"client.Cid": "088511e9-e1ea-4eba-b495-1c250a7c9158-connector-001-10004", "from remoteAddr": "[::1]:64130"}
+2025-08-28 16:23:42.865	debug	WebSocket connection attempt from 	{"remoteAddr": "[::1]:49164", "UserAgent": "Apifox/1.0.0 (https://apifox.com)"}
+2025-08-28 16:23:42.866	debug	WebSocket connection established	{"client.Cid": "cc3f4690-eab8-421e-8fa1-9afd6e41e7d4-connector-001-10005", "from remoteAddr": "[::1]:49164"}

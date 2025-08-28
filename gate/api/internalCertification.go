@@ -6,7 +6,7 @@ import (
 	"common/rpc"
 	"github.com/gin-gonic/gin"
 	"user/pb"
-	"utils/method"
+	"utils/trance"
 )
 
 type InternalCertificationHandler struct {
@@ -24,7 +24,7 @@ func (i *InternalCertificationHandler) SaveInternalCertification(ctx *gin.Contex
 		return
 	}
 
-	_, err := rpc.InternalCertificationServiceClient.SaveInternalCertification(method.GetTranceIdCtx(ctx), &ic)
+	_, err := rpc.InternalCertificationServiceClient.SaveInternalCertification(trance.GetTranceIdCtx(ctx), &ic)
 	if err != nil {
 		common.Fail(ctx, biz.SaveInternalCertification)
 

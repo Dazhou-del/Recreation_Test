@@ -3,8 +3,6 @@ package api
 import (
 	"common/biz"
 	"common/config"
-	"utils/method"
-
 	jwts "common/jwts"
 	"common/logs"
 	common "common/result"
@@ -13,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"user/pb"
+	"utils/trance"
 )
 
 type UserHandler struct {
@@ -33,7 +32,7 @@ func (u *UserHandler) Register(ctx *gin.Context) {
 	}
 
 	// 调用user rpc注册用户
-	response, err := rpc.UserClient.Register(method.GetTranceIdCtx(ctx), &req)
+	response, err := rpc.UserClient.Register(trance.GetTranceIdCtx(ctx), &req)
 	if err != nil {
 		common.Fail(ctx, msError.ToError(err))
 

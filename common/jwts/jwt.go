@@ -1,4 +1,4 @@
-package ijwt
+package jwts
 
 import (
 	"common/enum"

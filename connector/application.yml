@@ -1,0 +1,37 @@
+httpPort: 13000
+metricPort: 5856
+appName: connector
+server:
+  maxConn: 1000
+log:
+  level: DEBUG
+db:
+  mongo:
+    url: mongodb://localhost:27017
+    userName: root
+    password: 123456
+    minPoolSize: 10
+    maxPoolSize: 100
+    db: msqp
+  redis:
+    addr: localhost:6379
+    poolSize: 10
+    minIdleConnList: 1
+    password:
+jwt:
+  secret: 123456
+  exp: 7
+domain:
+  user:
+    name: user/v1
+    loadBalance: true
+etcd:
+  addrs:
+    - 127.0.0.1:2379
+  rwTimeout: 3
+  dialTimeout: 3
+services:
+  connector:
+    id: connector-1
+    clientHost: 127.0.0.1
+    clientPort: 12000

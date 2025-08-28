@@ -1,4 +1,4 @@
-package method
+package trance
 
 import (
 	"common/biz"

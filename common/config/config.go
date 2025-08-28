@@ -23,6 +23,10 @@ type Config struct {
 	Domain     map[string]Domain       `mapstructure:"domain" json:"domain"`
 	Services   map[string]ServicesConf `mapstructure:"services" json:"services"`
 	Cors       CORS                    `mapstructure:"cors" json:"cors"` // 跨越配置
+	Server     ServerConf              `mapstructure:"server" json:"server"`
+}
+type ServerConf struct {
+	MaxConn int `mapstructure:"maxConn" json:"maxConn"`
 }
 
 type CORS struct {

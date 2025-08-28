@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
-	"utils/idirectory"
+	"utils/directory"
 )
 
 var Log *Logger
@@ -20,7 +20,7 @@ type Logger struct {
 
 func NewZap(z config.Zap) {
 	// 判断是否有Director文件夹 没有就创建
-	if ok, _ := idirectory.PathExists(z.Director); !ok {
+	if ok, _ := directory.PathExists(z.Director); !ok {
 		fmt.Printf("create %v directory\n", z.Director)
 		_ = os.Mkdir(z.Director, os.ModePerm)
 	}

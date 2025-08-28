@@ -4,7 +4,9 @@ import (
 	"common/logs"
 	"context"
 	"core/repo"
+	"errors"
 	"fmt"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 )
 
@@ -79,4 +81,32 @@ func NewRedisDao(m *repo.Manager) *RedisDao {
 	return &RedisDao{
 		repo: m,
 	}
+}
+
+func (d *RedisDao) Store(ctx context.Context, key string, value string) error {
+	var err error
+	if d.repo.Redis.Cli != nil {
+		_, err = d.repo.Redis.Cli.Set(ctx, key, value, 0).Result()
+	} else {
+		_, err = d.repo.Redis.ClusterCli.Set(ctx, key, value, 0).Result()
+	}
+	return err
+}
+func (d *RedisDao) Get(ctx context.Context, key string) (string, error) {
+	var err error
+	var value string
+	if d.repo.Redis.Cli != nil {
+		value, err = d.repo.Redis.Cli.Get(ctx, key).Result()
+	} else {
+		value, err = d.repo.Redis.ClusterCli.Get(ctx, key).Result()
+
+	}
+	if errors.Is(err, redis.Nil) {
+		return "", nil
+	}
+	return value, err
+}
+
+func (d *RedisDao) Delete(ctx context.Context, key string) error {
+	return d.repo.Redis.Cli.Del(ctx, key).Err()
 }

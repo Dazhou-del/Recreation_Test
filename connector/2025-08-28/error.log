@@ -1,0 +1,16 @@
+2025-08-28 15:52:53.029	error	connect nats server fail,err	{"error": "dial tcp 127.0.0.1:4222: connectex: No connection could be made because the target machine actively refused it."}
+2025-08-28 15:53:06.639	error	connect nats server fail,err	{"error": "dial tcp 127.0.0.1:4222: connectex: No connection could be made because the target machine actively refused it."}
+2025-08-28 15:53:23.473	error	connect nats server fail,err	{"error": "dial tcp [::1]:4222: connectex: No connection could be made because the target machine actively refused it."}
+2025-08-28 16:10:25.326	error	unexpected close	{"client:": "6c7d2298-5749-428a-84b8-a8f80b69128c-connector-001-10001", "error": "websocket: close 1005 (no status)"}
+2025-08-28 16:10:53.043	error	decode stream	{"error": "data len invalid"}
+2025-08-28 16:11:12.024	error	unsupported stream type	{"messageType": 1}
+2025-08-28 16:12:50.544	error	unsupported stream type	{"messageType": 1}
+2025-08-28 16:12:51.725	error	unsupported stream type	{"messageType": 1}
+2025-08-28 16:13:05.717	error	unsupported stream type	{"messageType": 1}
+2025-08-28 16:13:58.518	error	routeEvent 	{"error": "no packetType found"}
+2025-08-28 16:15:10.346	error	routeEvent 	{"error": "no packetType found"}
+2025-08-28 16:15:31.621	error	routeEvent 	{"error": "no packetType found"}
+2025-08-28 16:16:11.932	error	routeEvent 	{"error": "no packetType found"}
+2025-08-28 16:22:38.435	error	routeEvent 	{"error": "no packetType found"}
+2025-08-28 16:23:38.178	error	routeEvent 	{"error": "no packetType found"}
+2025-08-28 16:23:57.899	error	routeEvent 	{"error": "no packetType found"}

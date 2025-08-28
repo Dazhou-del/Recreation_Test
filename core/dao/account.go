@@ -15,6 +15,12 @@ type AccountDao struct {
 	repo *repo.Manager
 }
 
+func NewAccountDao(m *repo.Manager) *AccountDao {
+	return &AccountDao{
+		repo: m,
+	}
+}
+
 func (d *AccountDao) SaveAccount(ctx context.Context, ac *entity.Account) error {
 	collection := d.repo.Mongo.Db.Collection("account")
 
@@ -42,8 +48,30 @@ func (d *AccountDao) FindAccount(ctx context.Context, account string) (*entity.A
 	return ac, nil
 }
 
-func NewAccountDao(m *repo.Manager) *AccountDao {
-	return &AccountDao{
-		repo: m,
+func (d *AccountDao) FindAccountByPhone(ctx context.Context, phone string) (*entity.Account, error) {
+	table := d.repo.Mongo.Db.Collection("account")
+	result := table.FindOne(ctx, bson.D{
+		{"phoneAccount", phone},
+	})
+	ac := new(entity.Account)
+	err := result.Decode(ac)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, nil
+		}
+		return nil, err
 	}
+	return ac, nil
+}
+
+func (d *AccountDao) UpdatePhone(ctx context.Context, uid string, phone string) error {
+	db := d.repo.Mongo.Db.Collection("account")
+	_, err := db.UpdateOne(ctx, bson.M{
+		"uid": uid,
+	}, bson.M{
+		"$set": bson.M{
+			"phoneAccount": phone,
+		},
+	})
+	return err
 }

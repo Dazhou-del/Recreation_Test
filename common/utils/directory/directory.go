@@ -1,4 +1,4 @@
-package idirectory
+package directory
 
 import (
 	"errors"

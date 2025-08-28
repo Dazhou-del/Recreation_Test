@@ -2,7 +2,7 @@ package router
 
 import (
 	"common/config"
-	middleware "common/middleware"
+	"common/middleware"
 	"common/rpc"
 	"gate/api"
 	"gate/enum"
