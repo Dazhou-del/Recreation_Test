@@ -173,6 +173,12 @@ func (m *Manager) routeEvent(packet *protocol.Packet, cid string) error {
 	return handler(packet, conn)
 }
 
+// SetConnectionRateLimit 设置连接速率限制
+func (m *Manager) SetConnectionRateLimit(connectionsPerSecond int) {
+	connectionRateLimiter = limit.NewRateLimiter(connectionsPerSecond, 1)
+	logs.Log.Info("Connection rate limit set to %d per second", zap.Any("connectionsPerSecond", connectionsPerSecond))
+}
+
 func (m *Manager) clientReadChanHandler() {
 	for body := range m.ClientReadChan {
 		// 根据连接ID分配到特定工作协程
@@ -188,6 +194,42 @@ func (m *Manager) clientReadChanHandler() {
 			go m.decodeClientPack(body) // 使用新的goroutine避免阻塞
 		}
 	}
+}
+
+// BroadcastToAll 向所有连接的客户端广播消息
+func (m *Manager) BroadcastToAll(messageType protocol.PackageType, data []byte) {
+	// 编码消息
+	res, err := protocol.Encode(messageType, data)
+	if err != nil {
+		logs.Log.Error("BroadcastToAll encode ", zap.Error(err))
+		return
+	}
+
+	// 并行处理每个分片
+	var wg sync.WaitGroup
+	for _, bucket := range m.clientBuckets {
+		wg.Add(1)
+		go func(b *ClientBucket) {
+			defer wg.Done()
+
+			// 获取分片中的所有连接
+			b.RLock()
+			connections := make([]Connection, 0, len(b.clients))
+			for _, conn := range b.clients {
+				connections = append(connections, conn)
+			}
+			b.RUnlock()
+
+			// 向每个连接发送消息
+			for _, conn := range connections {
+				conn.SendMessage(res)
+			}
+		}(bucket)
+	}
+
+	// 等待所有分片处理完成
+	wg.Wait()
+	logs.Log.Info("Broadcast message sent to all clients")
 }
 
 func (m *Manager) remoteReadChanHandler() {
@@ -776,4 +818,116 @@ func (m *Manager) Close() {
 
 	wg.Wait()
 	logs.Log.Info("All connections closed")
+}
+
+// GetAllClients 获取所有客户端连接
+func (m *Manager) GetAllClients() map[string]Connection {
+	result := make(map[string]Connection)
+
+	// 从所有分片中收集客户端
+	for _, bucket := range m.clientBuckets {
+		bucket.RLock()
+		for cid, conn := range bucket.clients {
+			result[cid] = conn
+		}
+		bucket.RUnlock()
+	}
+
+	return result
+}
+
+// GetConnectionCount 获取当前连接数量
+func (m *Manager) GetConnectionCount() int {
+	return int(atomic.LoadInt32(&m.stats.currentConnections))
+}
+
+// GetStats 获取性能统计信息
+func (m *Manager) GetStats() map[string]interface{} {
+	return map[string]interface{}{
+		"connections":            atomic.LoadInt32(&m.stats.currentConnections),
+		"messages_processed":     atomic.LoadInt64(&m.stats.messageProcessed),
+		"message_errors":         atomic.LoadInt64(&m.stats.messageErrors),
+		"avg_processing_time_us": atomic.LoadInt64(&m.stats.avgProcessingTime),
+		"worker_count":           m.workerCount,
+		"bucket_count":           len(m.clientBuckets),
+	}
+}
+
+// FindClientByUID 根据用户ID查找客户端连接
+func (m *Manager) FindClientByUID(uid string) Connection {
+	if uid == "" {
+		return nil
+	}
+
+	// 并行搜索所有分片
+	type result struct {
+		conn  Connection
+		found bool
+	}
+
+	results := make(chan result, len(m.clientBuckets))
+
+	for _, bucket := range m.clientBuckets {
+		go func(b *ClientBucket) {
+			b.RLock()
+			defer b.RUnlock()
+
+			for _, conn := range b.clients {
+				if conn.GetSession().Uid == uid {
+					results <- result{conn: conn, found: true}
+					return
+				}
+			}
+
+			results <- result{found: false}
+		}(bucket)
+	}
+
+	// 收集结果
+	for i := 0; i < len(m.clientBuckets); i++ {
+		if r := <-results; r.found {
+			return r.conn
+		}
+	}
+
+	return nil
+}
+
+// SetMaxConnections 设置最大连接数
+func (m *Manager) SetMaxConnections(maxConn int) {
+	// 只能在启动前调用
+	if m.connSemaphore == nil {
+		m.maxConnections = maxConn
+		m.connSemaphore = make(chan struct{}, maxConn)
+		logs.Log.Info("Max connections set to ", zap.Any("maxConn", maxConn))
+	} else {
+		logs.Log.Warn("Cannot change max connections after manager has started")
+	}
+}
+
+// SetWorkerCount 设置工作协程数量
+func (m *Manager) SetWorkerCount(count int) {
+	// 只能在启动前调用
+	if m.clientWorkers == nil {
+		m.workerCount = count
+		logs.Log.Info("Worker count set to", zap.Any("count", count))
+	} else {
+		logs.Log.Warn("Cannot change worker count after manager has started")
+	}
+}
+
+// SetBucketCount 设置分片数量
+func (m *Manager) SetBucketCount(count int) {
+	// 只能在启动前调用
+	if m.clientBuckets == nil {
+		// 确保是2的幂次方
+		bucketCount := 1
+		for bucketCount < count {
+			bucketCount *= 2
+		}
+		m.bucketMask = uint32(bucketCount - 1)
+		logs.Log.Info("Bucket count set to %d (rounded to power of 2)", zap.Any("bucketCount", bucketCount))
+	} else {
+		logs.Log.Warn("Cannot change bucket count after manager has started")
+	}
 }

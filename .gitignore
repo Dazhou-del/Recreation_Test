@@ -9,5 +9,6 @@
 *.vscode
 *.test
 *.out
+*.log
 log/
 
