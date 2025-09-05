@@ -18,10 +18,10 @@ var (
 )
 
 type WsConnection struct {
-	Cid           string
+	Cid           string // 客户端唯一标识
 	Conn          *websocket.Conn
 	manager       *Manager
-	ReadChan      chan *MsgPack
+	ReadChan      chan *MsgPack // 消息类型可根据不同需求自定义
 	WriteChan     chan []byte
 	Session       *Session
 	pingTicker    *time.Ticker
@@ -29,6 +29,11 @@ type WsConnection struct {
 	closeOnce     sync.Once
 	readChanOnce  sync.Once
 	writeChanOnce sync.Once
+}
+
+func NewWsConnection(conn *websocket.Conn, manager *Manager) *WsConnection {
+	// 从连接池获取对象
+	return GetWsConnectionPool().Get(conn, manager)
 }
 
 func (w *WsConnection) GetSession() *Session {
@@ -78,6 +83,7 @@ func (w *WsConnection) Run() {
 	w.Conn.SetPongHandler(w.PongHandler)
 }
 
+// writeMessage 写数据
 func (w *WsConnection) writeMessage() {
 	w.pingTicker = time.NewTicker(pingInterval)
 
@@ -103,7 +109,7 @@ func (w *WsConnection) writeMessage() {
 
 			logs.Log.Warn("message data ", zap.Any("message", message))
 
-			if err := w.Conn.WriteMessage(websocket.BinaryMessage, message); err != nil {
+			if err := w.Conn.WriteMessage(websocket.TextMessage, message); err != nil {
 				logs.Log.Error("writeMessage  BinaryMessage fail ", zap.Any("client:", w.Cid), zap.Error(err))
 			}
 		case <-w.pingTicker.C:
@@ -124,6 +130,7 @@ func (w *WsConnection) writeMessage() {
 	}
 }
 
+// readMessage 读数据
 func (w *WsConnection) readMessage() {
 	defer func() {
 		logs.Log.Info("readMessage stopped", zap.Any("client:", w.Cid))
@@ -153,7 +160,7 @@ func (w *WsConnection) readMessage() {
 				return
 			}
 
-			logs.Log.Warn("receive====%v", zap.Any("message", message))
+			logs.Log.Warn("receive====", zap.Any("message", message))
 
 			// 只支持二进制和json消息,如有需求可以添加
 			if messageType == websocket.BinaryMessage || messageType == websocket.TextMessage {
@@ -170,14 +177,10 @@ func (w *WsConnection) readMessage() {
 	}
 }
 
+// PongHandler ping处理器
 func (w *WsConnection) PongHandler(data string) error {
 	if err := w.Conn.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
 		return err
 	}
 	return nil
-}
-
-func NewWsConnection(conn *websocket.Conn, manager *Manager) *WsConnection {
-	// 从连接池获取对象
-	return GetWsConnectionPool().Get(conn, manager)
 }

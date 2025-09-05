@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"framework/game"
 	"framework/net"
-	"framework/remote"
 	"go.uber.org/zap"
 )
 
@@ -13,7 +12,6 @@ type Connector struct {
 	isRunning bool
 	wsManager *net.Manager
 	handlers  net.LogicHandler
-	remoteCli remote.Client
 }
 
 func Default() *Connector {
@@ -27,10 +25,6 @@ func (c *Connector) Run(serverId string, maxConn int) {
 		//启动websocket和nats
 		c.wsManager = net.NewManager(maxConn)
 		c.wsManager.ConnectorHandlers = c.handlers
-		//启动nats nats server不会存储消息
-		c.remoteCli = remote.NewNatsClient(serverId, c.wsManager.RemoteReadChan)
-		c.remoteCli.Run()
-		c.wsManager.RemoteCli = c.remoteCli
 		c.Serve(serverId)
 	}
 }

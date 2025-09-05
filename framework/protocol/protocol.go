@@ -51,38 +51,56 @@ const (
 	msgFlagBytes = 1
 )
 
+//type Packet struct {
+//	Type PackageType
+//	Len  uint32
+//	Body any
+//}
+
 type Packet struct {
-	Type PackageType
-	Len  uint32
-	Body any
+	Type      string   `json:"type"`
+	Len       uint32   `json:"len"`
+	Body      any      `json:"body"`
+	IsSendAll bool     `json:"isSendAll"`
+	PushUser  []string `json:"pushUser"`
 }
 
+//func Decode(payload []byte) (*Packet, error) {
+//	if len(payload) < HeaderLen {
+//		return nil, errors.New("data len invalid")
+//	}
+//	p := &Packet{}
+//	p.Type = PackageType(payload[0])
+//	p.Len = uint32(BytesToInt(payload[1:HeaderLen]))
+//	if p.Type == Handshake {
+//		var body HandshakeBody
+//		err := json.Unmarshal(payload[HeaderLen:], &body)
+//		if err != nil {
+//			return nil, err
+//		}
+//		if body.Sys.Dict != nil {
+//			SetDictionary(body.Sys.Dict)
+//		}
+//		p.Body = body
+//	}
+//	if p.Type == Data {
+//		m, err := MessageDecode(payload[HeaderLen:])
+//		if err != nil {
+//			return nil, err
+//		}
+//		p.Body = m
+//	}
+//	return p, nil
+//}
+
 func Decode(payload []byte) (*Packet, error) {
-	if len(payload) < HeaderLen {
-		return nil, errors.New("data len invalid")
+	packet := new(Packet)
+	err := json.Unmarshal(payload, &packet)
+	if err != nil {
+		return nil, err
 	}
-	p := &Packet{}
-	p.Type = PackageType(payload[0])
-	p.Len = uint32(BytesToInt(payload[1:HeaderLen]))
-	if p.Type == Handshake {
-		var body HandshakeBody
-		err := json.Unmarshal(payload[HeaderLen:], &body)
-		if err != nil {
-			return nil, err
-		}
-		if body.Sys.Dict != nil {
-			SetDictionary(body.Sys.Dict)
-		}
-		p.Body = body
-	}
-	if p.Type == Data {
-		m, err := MessageDecode(payload[HeaderLen:])
-		if err != nil {
-			return nil, err
-		}
-		p.Body = m
-	}
-	return p, nil
+
+	return packet, nil
 }
 
 func SetDictionary(dict map[string]uint16) {
@@ -315,35 +333,37 @@ func InflateData(data []byte) ([]byte, error) {
 }
 
 func Encode(packageType PackageType, body []byte) ([]byte, error) {
-	if packageType == None {
-		return nil, errors.New("encode unsupported packageType")
-	}
-	if len(body) > MaxPacketSize {
-		return nil, errors.New("encode body size too big")
-	}
-	buf := make([]byte, len(body)+HeaderLen)
-	//1. 类型
-	buf[0] = byte(packageType)
-	//2. 长度
-	copy(buf[1:HeaderLen], IntToBytes(len(body)))
-	//3.body
-	copy(buf[HeaderLen:], body)
-	return buf, nil
+	//if packageType == None {
+	//	return nil, errors.New("encode unsupported packageType")
+	//}
+	//if len(body) > MaxPacketSize {
+	//	return nil, errors.New("encode body size too big")
+	//}
+	//buf := make([]byte, len(body)+HeaderLen)
+	////1. 类型
+	//buf[0] = byte(packageType)
+	////2. 长度
+	//copy(buf[1:HeaderLen], IntToBytes(len(body)))
+	////3.body
+	//copy(buf[HeaderLen:], body)
+	//return buf, nil
+	return nil, nil
 }
-func (p *Packet) HandshakeBody() *HandshakeBody {
-	if p.Type == Handshake {
-		body := p.Body.(HandshakeBody)
-		return &body
-	}
-	return nil
-}
-func (p *Packet) MessageBody() *Message {
-	if p.Type == Data {
-		body := p.Body.(Message)
-		return &body
-	}
-	return nil
-}
+
+//func (p *Packet) HandshakeBody() *HandshakeBody {
+//	if p.Type == Handshake {
+//		body := p.Body.(HandshakeBody)
+//		return &body
+//	}
+//	return nil
+//}
+//func (p *Packet) MessageBody() *Message {
+//	if p.Type == Data {
+//		body := p.Body.(Message)
+//		return &body
+//	}
+//	return nil
+//}
 
 type HandshakeBody struct {
 	Sys Sys `json:"sys"`

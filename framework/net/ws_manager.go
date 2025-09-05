@@ -4,18 +4,13 @@ import (
 	"common/logs"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"framework/game"
 	"framework/protocol"
-	"framework/remote"
 	"framework/stream"
 	"github.com/gorilla/websocket"
-	"github.com/samber/lo"
 	"go.uber.org/zap"
 	"hash/fnv"
 	"net/http"
 	"runtime"
-	"strings"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -38,13 +33,12 @@ var (
 )
 
 type Manager struct {
-	// 移除全局锁，使用分片锁
 	dataLock           sync.RWMutex // 仅用于保护data字段
 	websocketUpgrade   *websocket.Upgrader
 	ServerId           string
 	CheckOriginHandler CheckOriginHandler
 
-	// 分片存储客户端连接
+	// 分片存储客户端连接，使用分片锁
 	clientBuckets []*ClientBucket
 	bucketMask    uint32
 
@@ -53,13 +47,9 @@ type Manager struct {
 	clientWorkers  []chan *MsgPack // 工作协程池
 	workerCount    int             // 工作协程数量
 
-	handlers          map[protocol.PackageType]EventHandler
+	//handlers          map[protocol.PackageType]EventHandler
+	handlers          map[string]EventHandler
 	ConnectorHandlers LogicHandler
-
-	// 远程消息处理
-	RemoteReadChan chan []byte
-	RemoteCli      remote.Client
-	RemotePushChan chan *stream.Msg
 
 	// 共享数据
 	data map[string]any
@@ -76,7 +66,7 @@ type Manager struct {
 		currentConnections int32
 	}
 
-	// 负载均衡状态
+	// 负载均衡状态,只有客户端与ws服务端这层则无需配置
 	lbState loadBalanceState
 }
 
@@ -93,6 +83,90 @@ func NewClientBucket() *ClientBucket {
 	}
 }
 
+// NewManager 创建一个新的连接管理器
+func NewManager(maxConn int) *Manager {
+	// 确定分片数量，使用2的幂次方以便位运算
+	bucketCount := 32
+	bucketMask := uint32(bucketCount - 1)
+
+	// 确定工作协程数量，默认为CPU核心数的2倍
+	workerCount := runtime.NumCPU() * 2
+
+	m := &Manager{
+		ClientReadChan: make(chan *MsgPack, 2048), // 增大缓冲区
+		handlers:       make(map[string]EventHandler),
+		data:           make(map[string]any),
+		maxConnections: maxConn,
+		connSemaphore:  make(chan struct{}, maxConn),
+		bucketMask:     bucketMask,
+		workerCount:    workerCount,
+		// 初始化负载均衡状态
+		lbState: loadBalanceState{
+			strategy:      Random, // 默认使用随机策略
+			roundRobinIdx: make(map[string]int),
+			hashRing:      make(map[string]*consistentHash),
+			serverLoads:   make(map[string]int),
+		},
+	}
+
+	// 初始化客户端分片
+	m.clientBuckets = make([]*ClientBucket, bucketCount)
+	for i := 0; i < bucketCount; i++ {
+		m.clientBuckets[i] = NewClientBucket()
+	}
+
+	// 初始化工作协程池
+	m.clientWorkers = make([]chan *MsgPack, workerCount)
+	for i := 0; i < workerCount; i++ {
+		m.clientWorkers[i] = make(chan *MsgPack, 256)
+	}
+
+	// 设置默认的CheckOriginHandler
+	m.CheckOriginHandler = func(r *http.Request) bool {
+		return true
+	}
+
+	logs.Log.Info("WebSocket manager initialized with", zap.Any("workerCount", workerCount), zap.Any("worker goroutines and %d connection buckets", bucketCount))
+
+	return m
+}
+
+// Close 关闭wsManager
+func (m *Manager) Close() {
+	// 使用多个goroutine并行关闭连接
+	var wg sync.WaitGroup
+
+	for i, bucket := range m.clientBuckets {
+		wg.Add(1)
+		go func(b *ClientBucket, bucketID int) {
+			defer wg.Done()
+
+			b.Lock()
+			clients := make([]Connection, 0, len(b.clients))
+			for _, client := range b.clients {
+				clients = append(clients, client)
+			}
+
+			// 清空map
+			for cid := range b.clients {
+				delete(b.clients, cid)
+			}
+			b.Unlock()
+
+			// 关闭连接
+			for _, client := range clients {
+				client.Close()
+				// 不需要从connSemaphore中取出，因为整个Manager都要关闭了
+			}
+
+			logs.Log.Info("Closed", zap.Any("len(clients)", len(clients)), zap.Any("connections in bucket", bucketID))
+		}(bucket, i)
+	}
+
+	wg.Wait()
+	logs.Log.Info("All connections closed")
+}
+
 type CheckOriginHandler func(r *http.Request) bool
 type HandlerFunc func(session *Session, body []byte) (any, error)
 type LogicHandler map[string]HandlerFunc
@@ -105,16 +179,14 @@ func (m *Manager) Run(addr string) {
 	}
 
 	go m.clientReadChanHandler()
-	go m.remoteReadChanHandler()
-	go m.remotePushChanHandler()
 
 	// 启动性能监控
 	go m.monitorPerformance()
 
 	http.HandleFunc("/", m.serveWS)
 
-	//设置不同的消息处理器
 	m.setupEventHandlers()
+
 	logs.Log.Info("WebSocket manager started with",
 		zap.Any("workerCount", m.workerCount),
 		zap.Any("worker goroutines and connection buckets", len(m.clientBuckets)))
@@ -137,7 +209,7 @@ func (m *Manager) clientWorkerRoutine(workerID int) {
 	}
 }
 
-// 解析协议 decodeClientPack
+// decodeClientPack 解析协议
 func (m *Manager) decodeClientPack(body *MsgPack) {
 	// 可根据不同的协议类型进行解析，按需更改
 	packet, err := protocol.Decode(body.Body)
@@ -153,6 +225,7 @@ func (m *Manager) decodeClientPack(body *MsgPack) {
 	}
 }
 
+// routeEvent 根据路由处理事件
 func (m *Manager) routeEvent(packet *protocol.Packet, cid string) error {
 	// 根据packet.type来做不同的处理
 	bucket := m.getBucket(cid)
@@ -186,205 +259,6 @@ func (m *Manager) clientReadChanHandler() {
 			atomic.AddInt64(&m.stats.messageErrors, 1)
 			logs.Log.Warn("Worker queue  full, processing message in main goroutine", zap.Any("workerID", workerID))
 			go m.decodeClientPack(body) // 使用新的goroutine避免阻塞
-		}
-	}
-}
-
-func (m *Manager) remoteReadChanHandler() {
-	const batchSize = 32
-	batch := make([][]byte, 0, batchSize)
-
-	processBatch := func() {
-		if len(batch) == 0 {
-			return
-		}
-
-		// 并行处理批次中的消息
-		var wg sync.WaitGroup
-		for _, body := range batch {
-			wg.Add(1)
-			go func(msgBody []byte) {
-				defer wg.Done()
-
-				var msg stream.Msg
-				if err := json.Unmarshal(msgBody, &msg); err != nil {
-					logs.Log.Error("nats remote stream format fail", zap.Error(err))
-					return
-				}
-
-				if msg.SessionType == stream.Session {
-					//需要特出处理，session类型是存储在connection中的session 并不 推送客户端
-					m.setSessionData(msg)
-					return
-				}
-
-				if msg.Body != nil {
-					if msg.Body.Type == protocol.Request || msg.Body.Type == protocol.Response {
-						//给客户端回信息 都是 response
-						msg.Body.Type = protocol.Response
-						m.Response(&msg)
-					}
-					if msg.Body.Type == protocol.Push {
-						select {
-						case m.RemotePushChan <- &msg:
-							// 成功发送到推送通道
-						default:
-							// 通道已满，直接处理
-							if msg.Body.Type == protocol.Push {
-								m.Response(&msg)
-							}
-						}
-					}
-				}
-			}(body)
-		}
-
-		// 等待所有消息处理完成
-		wg.Wait()
-		batch = batch[:0] // 清空批次
-	}
-
-	ticker := time.NewTicker(5 * time.Millisecond)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case body, ok := <-m.RemoteReadChan:
-			if !ok {
-				// 通道已关闭
-				processBatch() // 处理剩余消息
-				return
-			}
-
-			batch = append(batch, body)
-			if len(batch) >= batchSize {
-				processBatch()
-			}
-
-		case <-ticker.C:
-			processBatch()
-		}
-	}
-}
-
-func (m *Manager) remotePushChanHandler() {
-	const batchSize = 32
-	batch := make([]*stream.Msg, 0, batchSize)
-
-	processBatch := func() {
-		if len(batch) == 0 {
-			return
-		}
-
-		// 并行处理批次中的消息
-		var wg sync.WaitGroup
-		for _, msg := range batch {
-			if msg.Body.Type == protocol.Push {
-				wg.Add(1)
-				go func(pushMsg *stream.Msg) {
-					defer wg.Done()
-					m.Response(pushMsg)
-				}(msg)
-			}
-		}
-
-		// 等待所有消息处理完成
-		wg.Wait()
-		batch = batch[:0] // 清空批次
-	}
-
-	ticker := time.NewTicker(5 * time.Millisecond)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case msg, ok := <-m.RemotePushChan:
-			if !ok {
-				// 通道已关闭
-				processBatch() // 处理剩余消息
-				return
-			}
-
-			batch = append(batch, msg)
-			if len(batch) >= batchSize {
-				processBatch()
-			}
-
-		case <-ticker.C:
-			processBatch()
-		}
-	}
-}
-
-func (m *Manager) Response(msg *stream.Msg) {
-	// 编码消息（只编码一次）
-	buf, err := protocol.MessageEncode(msg.Body)
-	if err != nil {
-		logs.Log.Error("Response MessageEncode fail", zap.Error(err))
-
-		return
-	}
-
-	res, err := protocol.Encode(protocol.Data, buf)
-	if err != nil {
-		logs.Log.Error("Response Encode fail", zap.Error(err))
-		return
-	}
-
-	if msg.Body.Type == protocol.Push {
-		// 推送消息给多个用户
-		if len(msg.PushUser) > 0 {
-			// 创建用户ID到连接的映射
-			userConnectionList := make(map[string][]Connection)
-
-			// 并行收集每个分片中的目标连接
-			var wg sync.WaitGroup
-			var mu sync.Mutex // 保护userConnections
-			for _, bucket := range m.clientBuckets {
-				wg.Add(1)
-				go func(b *ClientBucket) {
-					defer wg.Done()
-
-					b.RLock()
-
-					for _, conn := range b.clients {
-						uid := conn.GetSession().Uid
-						if lo.Contains(msg.PushUser, uid) {
-							mu.Lock()
-							userConnectionList[uid] = append(userConnectionList[uid], conn)
-							mu.Unlock()
-						}
-					}
-					b.Unlock()
-				}(bucket)
-			}
-
-			wg.Wait()
-
-			// 并行发送消息
-			var sendWg sync.WaitGroup
-			for _, connections := range userConnectionList {
-				for _, conn := range connections {
-					sendWg.Add(1)
-					go func(c Connection) {
-						defer sendWg.Done()
-						c.SendMessage(res)
-					}(conn)
-				}
-			}
-
-			// 可选：等待所有消息发送完成
-			// sendWg.Wait()
-		}
-	} else if msg.Cid != "" {
-		// 发送消息给单个客户端
-		bucket := m.getBucket(msg.Cid)
-		bucket.RLock()
-		connection, ok := bucket.clients[msg.Cid]
-		bucket.RUnlock()
-
-		if ok {
-			connection.SendMessage(res)
 		}
 	}
 }
@@ -445,6 +319,7 @@ func (m *Manager) setSessionData(msg stream.Msg) {
 	}
 }
 
+// removeClient 从管理器中删除一个客户端
 func (m *Manager) removeClient(wc *WsConnection) {
 	bucket := m.getBucket(wc.Cid)
 
@@ -467,13 +342,14 @@ func (m *Manager) removeClient(wc *WsConnection) {
 	}
 }
 
-// 获取连接所在的分片
+// getBucket 获取连接所在的分片
 func (m *Manager) getBucket(cid string) *ClientBucket {
 	hash := fnv32(cid)
 	index := hash & m.bucketMask
 	return m.clientBuckets[index]
 }
 
+// addClient 添加连接
 func (m *Manager) addClient(client *WsConnection) {
 	// 使用分片锁
 	bucket := m.getBucket(client.Cid)
@@ -509,7 +385,7 @@ func fnv32(key string) uint32 {
 	return h.Sum32()
 }
 
-// 性能监控
+// monitorPerformance 性能监控
 func (m *Manager) monitorPerformance() {
 	ticker := time.NewTicker(1 * time.Minute)
 	defer ticker.Stop()
@@ -519,10 +395,10 @@ func (m *Manager) monitorPerformance() {
 			zap.Any("messages_processed", atomic.LoadInt64(&m.stats.messageProcessed)),
 			zap.Any("avg_processing_time", atomic.LoadInt64(&m.stats.avgProcessingTime)),
 			zap.Any("errors", atomic.LoadInt64(&m.stats.messageErrors)))
-
 	}
 }
 
+// serveWS 启动WebSocket服务
 func (m *Manager) serveWS(w http.ResponseWriter, r *http.Request) {
 	// 连接限流
 	if !connectionRateLimiter.Allow() {
@@ -565,8 +441,17 @@ func (m *Manager) serveWS(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 设置读写超时
-	wsConn.SetReadDeadline(time.Now().Add(120 * time.Second))
-	wsConn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+	if err := wsConn.SetReadDeadline(time.Now().Add(120 * time.Second)); err != nil {
+		logs.Log.Error("websocketUpgrade.SetReadDeadline fail ", zap.Error(err), zap.Any("from remoteAddr", r.RemoteAddr))
+
+		return
+	}
+
+	if err := wsConn.SetWriteDeadline(time.Now().Add(10 * time.Second)); err != nil {
+		logs.Log.Error("websocketUpgrade.SetWriteDeadline fail ", zap.Error(err), zap.Any("from remoteAddr", r.RemoteAddr))
+
+		return
+	}
 
 	// 创建客户端连接
 	client := NewWsConnection(wsConn, m)
@@ -579,201 +464,147 @@ func (m *Manager) serveWS(w http.ResponseWriter, r *http.Request) {
 	client.Run()
 }
 
+// setupEventHandlers 设置事件处理器
 func (m *Manager) setupEventHandlers() {
-	m.handlers[protocol.Handshake] = m.HandshakeHandler
-	m.handlers[protocol.HandshakeAck] = m.HandshakeAckHandler
-	m.handlers[protocol.Heartbeat] = m.HeartbeatHandler
-	m.handlers[protocol.Data] = m.MessageHandler
-	m.handlers[protocol.Kick] = m.KickHandler
+	//m.handlers[protocol.Handshake] = m.HandshakeHandler
+	//m.handlers[protocol.HandshakeAck] = m.HandshakeAckHandler
+	//m.handlers[protocol.Heartbeat] = m.HeartbeatHandler
+	//m.handlers[protocol.Data] = m.MessageHandler
+	//m.handlers[protocol.Kick] = m.KickHandler
+	// 可定义消息处理器
+	m.handlers["1"] = m.MessageHandler
 }
 
-func (m *Manager) HandshakeHandler(packet *protocol.Packet, c Connection) error {
-	res := protocol.HandshakeResponse{
-		Code: 200,
-		Sys: protocol.Sys{
-			Heartbeat: 3,
-		},
-	}
-
-	data, _ := json.Marshal(res)
-	buf, err := protocol.Encode(packet.Type, data)
-	if err != nil {
-		logs.Log.Error("encode packet ", zap.Error(err))
-
-		return err
-	}
-	return c.SendMessage(buf)
-}
-
-func (m *Manager) HandshakeAckHandler(packet *protocol.Packet, c Connection) error {
-	return nil
-}
-
-func (m *Manager) HeartbeatHandler(packet *protocol.Packet, c Connection) error {
-	var res []byte
-	data, _ := json.Marshal(res)
-	buf, err := protocol.Encode(packet.Type, data)
-	if err != nil {
-		logs.Log.Error("encode packet err", zap.Error(err))
-		return err
-	}
-
-	return c.SendMessage(buf)
-}
-
+// MessageHandler 消息处理器
 func (m *Manager) MessageHandler(packet *protocol.Packet, c Connection) error {
-	message := packet.MessageBody()
-	//connector.entryHandler.entry
-	routeStr := message.Route
-	routers := strings.Split(routeStr, ".")
-	if len(routers) != 3 {
-		return errors.New("router unsupported")
+	res, err := json.Marshal(packet.Body)
+	if err != nil {
+		logs.Log.Error("MessageHandler fail", zap.Error(err), zap.Any("packet.Body", packet.Body))
 	}
 
-	serverType := routers[0]
-	handlerMethod := fmt.Sprintf("%s.%s", routers[1], routers[2])
-	connectorConfig := game.Conf.GetConnectorByServerType(serverType)
-	if connectorConfig != nil {
-		//本地connector服务器处理
-		handler, ok := m.ConnectorHandlers[handlerMethod]
-		if ok {
-			data, err := handler(c.GetSession(), message.Data)
-			if err != nil {
-				return err
-			}
-			marshal, _ := json.Marshal(data)
-			message.Type = protocol.Response
-			message.Data = marshal
-			encode, err := protocol.MessageEncode(message)
-			if err != nil {
-				return err
-			}
-			res, err := protocol.Encode(packet.Type, encode)
-			if err != nil {
-				return err
-			}
-			return c.SendMessage(res)
+	m.BroadcastToAll(packet)
+	return c.SendMessage(res)
+}
+
+// UpdateServerLoad 更新服务器负载
+func (m *Manager) UpdateServerLoad(serverID string, load int) {
+	m.lbState.mu.Lock()
+	defer m.lbState.mu.Unlock()
+
+	m.lbState.serverLoads[serverID] = load
+}
+
+// GetAllClients 获取所有客户端连接
+func (m *Manager) GetAllClients() map[string]Connection {
+	result := make(map[string]Connection)
+
+	// 从所有分片中收集客户端
+	for _, bucket := range m.clientBuckets {
+		bucket.RLock()
+		for cid, conn := range bucket.clients {
+			result[cid] = conn
 		}
-	} else {
-		//nats 远端调用处理 hall.userHandler.updateUserAddress
-		dst, err := m.selectDst(serverType)
-		if err != nil {
-			logs.Log.Error("remote send stream selectDst", zap.Error(err))
+		bucket.RUnlock()
+	}
 
-			return err
-		}
+	return result
+}
 
-		msg := &stream.Msg{
-			Cid:         c.GetSession().Cid,
-			Uid:         c.GetSession().Uid,
-			Src:         m.ServerId,
-			ConnectorId: m.ServerId,
-			Dst:         dst,
-			Router:      handlerMethod,
-			Body:        message,
-			SessionData: &stream.SessionData{
-				SingleData: c.GetSession().data,
-				AllData:    c.GetSession().all,
-			},
-		}
-		data, _ := json.Marshal(msg)
-		logs.Log.Warn("remote send stream", zap.Any("data", string(msg.Body.Data)))
-		err = m.RemoteCli.SendMsg(dst, data)
+// GetConnectionCount 获取当前连接数量
+func (m *Manager) GetConnectionCount() int {
+	return int(atomic.LoadInt32(&m.stats.currentConnections))
+}
 
-		if err != nil {
-			logs.Log.Error("remote send stream ", zap.Error(err))
+// GetStats 获取性能统计信息
+func (m *Manager) GetStats() map[string]interface{} {
+	return map[string]interface{}{
+		"connections":            atomic.LoadInt32(&m.stats.currentConnections),
+		"messages_processed":     atomic.LoadInt64(&m.stats.messageProcessed),
+		"message_errors":         atomic.LoadInt64(&m.stats.messageErrors),
+		"avg_processing_time_us": atomic.LoadInt64(&m.stats.avgProcessingTime),
+		"worker_count":           m.workerCount,
+		"bucket_count":           len(m.clientBuckets),
+	}
+}
 
-			return err
+// FindClientByUID 根据用户ID查找客户端连接
+func (m *Manager) FindClientByUID(uid string) Connection {
+	if uid == "" {
+		return nil
+	}
+
+	// 并行搜索所有分片
+	type result struct {
+		conn  Connection
+		found bool
+	}
+
+	results := make(chan result, len(m.clientBuckets))
+
+	for _, bucket := range m.clientBuckets {
+		go func(b *ClientBucket) {
+			b.RLock()
+			defer b.RUnlock()
+
+			for _, conn := range b.clients {
+				if conn.GetSession().Uid == uid {
+					results <- result{conn: conn, found: true}
+					return
+				}
+			}
+
+			results <- result{found: false}
+		}(bucket)
+	}
+
+	// 收集结果
+	for i := 0; i < len(m.clientBuckets); i++ {
+		if r := <-results; r.found {
+			return r.conn
 		}
 	}
+
 	return nil
 }
 
-func (m *Manager) KickHandler(packet *protocol.Packet, c Connection) error {
-	return nil
+// SetConnectionRateLimit 设置连接速率限制
+func (m *Manager) SetConnectionRateLimit(connectionsPerSecond int) {
+	connectionRateLimiter = limit.NewRateLimiter(connectionsPerSecond, 1)
+	logs.Log.Info("Connection rate limit set to %d per second", zap.Any("connectionsPerSecond", connectionsPerSecond))
 }
 
-// NewManager 创建一个新的连接管理器
-func NewManager(maxConn int) *Manager {
-	// 确定分片数量，使用2的幂次方以便位运算
-	bucketCount := 32
-	bucketMask := uint32(bucketCount - 1)
-
-	// 确定工作协程数量，默认为CPU核心数的2倍
-	workerCount := runtime.NumCPU() * 2
-
-	m := &Manager{
-		ClientReadChan: make(chan *MsgPack, 2048), // 增大缓冲区
-		handlers:       make(map[protocol.PackageType]EventHandler),
-		RemoteReadChan: make(chan []byte, 2048),      // 增大缓冲区
-		RemotePushChan: make(chan *stream.Msg, 2048), // 增大缓冲区
-		data:           make(map[string]any),
-		maxConnections: maxConn,
-		connSemaphore:  make(chan struct{}, maxConn),
-		bucketMask:     bucketMask,
-		workerCount:    workerCount,
-		// 初始化负载均衡状态
-		lbState: loadBalanceState{
-			strategy:      Random, // 默认使用随机策略
-			roundRobinIdx: make(map[string]int),
-			hashRing:      make(map[string]*consistentHash),
-			serverLoads:   make(map[string]int),
-		},
+// BroadcastToAll 向所有连接的客户端广播消息
+func (m *Manager) BroadcastToAll(packet *protocol.Packet) {
+	res, err := json.Marshal(packet.Body)
+	if err != nil {
+		logs.Log.Error("MessageHandler fail", zap.Error(err), zap.Any("packet.Body", packet.Body))
 	}
 
-	// 初始化客户端分片
-	m.clientBuckets = make([]*ClientBucket, bucketCount)
-	for i := 0; i < bucketCount; i++ {
-		m.clientBuckets[i] = NewClientBucket()
-	}
-
-	// 初始化工作协程池
-	m.clientWorkers = make([]chan *MsgPack, workerCount)
-	for i := 0; i < workerCount; i++ {
-		m.clientWorkers[i] = make(chan *MsgPack, 256)
-	}
-
-	// 设置默认的CheckOriginHandler
-	m.CheckOriginHandler = func(r *http.Request) bool {
-		return true
-	}
-
-	logs.Log.Info("WebSocket manager initialized with", zap.Any("workerCount", workerCount), zap.Any("worker goroutines and %d connection buckets", bucketCount))
-
-	return m
-}
-
-func (m *Manager) Close() {
-	// 使用多个goroutine并行关闭连接
+	// 并行处理每个分片
 	var wg sync.WaitGroup
-
-	for i, bucket := range m.clientBuckets {
+	for _, bucket := range m.clientBuckets {
 		wg.Add(1)
-		go func(b *ClientBucket, bucketID int) {
+		go func(b *ClientBucket) {
 			defer wg.Done()
 
-			b.Lock()
-			clients := make([]Connection, 0, len(b.clients))
-			for _, client := range b.clients {
-				clients = append(clients, client)
+			// 获取分片中的所有连接
+			b.RLock()
+			connections := make([]Connection, 0, len(b.clients))
+			for _, conn := range b.clients {
+				connections = append(connections, conn)
 			}
+			b.RUnlock()
 
-			// 清空map
-			for cid := range b.clients {
-				delete(b.clients, cid)
+			// 向每个连接发送消息
+			for _, conn := range connections {
+				if err := conn.SendMessage(res); err != nil {
+					logs.Log.Error("SendMessage fail", zap.Error(err), zap.Any("data", res))
+				}
 			}
-			b.Unlock()
-
-			// 关闭连接
-			for _, client := range clients {
-				client.Close()
-				// 不需要从connSemaphore中取出，因为整个Manager都要关闭了
-			}
-
-			logs.Log.Info("Closed", zap.Any("len(clients)", len(clients)), zap.Any("connections in bucket", bucketID))
-		}(bucket, i)
+		}(bucket)
 	}
 
+	// 等待所有分片处理完成
 	wg.Wait()
-	logs.Log.Info("All connections closed")
+	logs.Log.Info("Broadcast message sent to all clients")
 }

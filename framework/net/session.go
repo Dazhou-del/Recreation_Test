@@ -1,11 +1,6 @@
 package net
 
 import (
-	"common/logs"
-	"encoding/json"
-	"framework/protocol"
-	"framework/stream"
-	"go.uber.org/zap"
 	"sync"
 )
 
@@ -58,26 +53,26 @@ func (s *Session) SetAll(data map[string]any) {
 	}
 }
 
-func (s *Session) PushData(dst string, router string, message *protocol.Message) {
-	msg := &stream.Msg{
-		Cid:         s.Cid,
-		Uid:         s.Uid,
-		Src:         s.manager.ServerId,
-		ConnectorId: s.manager.ServerId,
-		Dst:         dst,
-		Router:      router,
-		Body:        message,
-		SessionData: &stream.SessionData{
-			SingleData: s.data,
-			AllData:    s.all,
-		},
-	}
-
-	data, _ := json.Marshal(msg)
-	if err := s.manager.RemoteCli.SendMsg(dst, data); err != nil {
-		logs.Log.Error("push session data err", zap.Error(err))
-	}
-}
+//func (s *Session) PushData(dst string, router string, message *protocol.Message) {
+//	msg := &stream.Msg{
+//		Cid:         s.Cid,
+//		Uid:         s.Uid,
+//		Src:         s.manager.ServerId,
+//		ConnectorId: s.manager.ServerId,
+//		Dst:         dst,
+//		Router:      router,
+//		Body:        message,
+//		SessionData: &stream.SessionData{
+//			SingleData: s.data,
+//			AllData:    s.all,
+//		},
+//	}
+//
+//	data, _ := json.Marshal(msg)
+//	if err := s.manager.RemoteCli.SendMsg(dst, data); err != nil {
+//		logs.Log.Error("push session data err", zap.Error(err))
+//	}
+//}
 
 func (s *Session) Close() {
 	s.Lock()

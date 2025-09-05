@@ -394,11 +394,3 @@ func ParseLoadBalanceStrategy(s string) (LoadBalanceStrategy, error) {
 		return Random, fmt.Errorf("unknown load balance strategy: %s", s)
 	}
 }
-
-// UpdateServerLoad 更新服务器负载
-func (m *Manager) UpdateServerLoad(serverID string, load int) {
-	m.lbState.mu.Lock()
-	defer m.lbState.mu.Unlock()
-
-	m.lbState.serverLoads[serverID] = load
-}

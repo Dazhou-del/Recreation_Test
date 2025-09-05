@@ -4,7 +4,15 @@ appName: connector
 server:
   maxConn: 1000
 log:
-  level: DEBUG
+  level: info # info error warn
+  format: console # console 有颜色  json 无颜色
+  prefix: "[test/dazhou]"
+  director: log
+  show-line: true
+  encode-level: LowercaseColorLevelEncoder
+  stacktrace-key: stacktrace
+  log-in-console: true
+  retention-day: -1
 db:
   mongo:
     url: mongodb://localhost:27017

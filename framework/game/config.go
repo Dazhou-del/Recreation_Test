@@ -110,28 +110,6 @@ func typeServersConfig() {
 }
 
 func readGameConfig(configFile string) {
-	//gc := make(map[string]GameConfigValue)
-	//v := viper.New()
-	//v.SetConfigFile(configFile)
-	//v.WatchConfig()
-	//v.OnConfigChange(func(in fsnotify.Event) {
-	//	log.Println("gameConfig配置文件被修改了")
-	//	err := v.Unmarshal(&gc)
-	//	if err != nil {
-	//		panic(fmt.Errorf("gameConfig Unmarshal change config data,err:%v \n", err))
-	//	}
-	//	Conf.GameConfig = gc
-	//})
-	//err := v.ReadInConfig()
-	//if err != nil {
-	//	panic(fmt.Errorf("gameConfig 读取配置文件出错,err:%v \n", err))
-	//}
-	//log.Println("%v", v.AllKeys())
-	//err = v.Unmarshal(&gc)
-	//if err != nil {
-	//	panic(fmt.Errorf("gameConfig Unmarshal config data,err:%v \n", err))
-	//}
-	//Conf.GameConfig = gc
 	file, err := os.Open(configFile)
 	if err != nil {
 		panic(err)

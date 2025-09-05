@@ -36,7 +36,7 @@ func Run(ctx context.Context) error {
 		logs.Log.Info("stop app finish")
 	}
 
-	//期望有一个优雅启停 遇到中断 退出 终止 挂断
+	// 优雅启停 遇到中断 退出 终止 挂断
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGHUP)
 	for {

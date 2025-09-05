@@ -127,3 +127,290 @@
 2025-08-28 16:31:02.102	info	Closed	{"len(clients)": 0, "connections in bucket": 30}
 2025-08-28 16:31:02.101	info	Closed	{"len(clients)": 0, "connections in bucket": 20}
 2025-08-28 16:31:02.103	info	All connections closed
+2025-08-28 16:34:10.171	info	WebSocket manager initialized with	{"workerCount": 40, "worker goroutines and %d connection buckets": 32}
+2025-08-28 16:34:10.189	info	run connector	{"serverId": "connector-001"}
+2025-08-28 16:34:10.189	info	WebSocket manager started with	{"workerCount": 40, "worker goroutines and connection buckets": 32}
+2025-08-28 16:35:10.190	info	Performance stats	{"connections": 1, "messages_processed": 5, "avg_processing_time": 32, "errors": 5}
+2025-08-28 16:36:10.190	info	Performance stats	{"connections": 1, "messages_processed": 5, "avg_processing_time": 32, "errors": 5}
+2025-08-28 16:37:01.478	info	readMessage stopped	{"client:": "ccf6aa0d-3278-4a35-947a-6aef06572e17-connector-001-10001"}
+2025-08-28 16:37:01.478	info	writeMessage stopped	{"client:": "ccf6aa0d-3278-4a35-947a-6aef06572e17-connector-001-10001"}
+2025-08-28 16:37:01.478	info	client connection closed	{"cid:": "ccf6aa0d-3278-4a35-947a-6aef06572e17-connector-001-10001"}
+2025-08-28 16:37:10.190	info	Performance stats	{"connections": 0, "messages_processed": 5, "avg_processing_time": 32, "errors": 5}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 3}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 22}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 0}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 1}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 4}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 2}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 10}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 7}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 8}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 5}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 14}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 9}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 13}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 6}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 16}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 11}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 31}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 18}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 24}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 15}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 17}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 25}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 29}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 12}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 20}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 21}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 30}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 26}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 23}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 27}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 28}
+2025-08-28 16:37:50.102	info	Closed	{"len(clients)": 0, "connections in bucket": 19}
+2025-08-28 16:37:50.104	info	All connections closed
+2025-08-28 16:37:53.104	info	stop app finish
+2025-08-28 16:37:53.104	info	connector app quit
+2025-08-28 16:39:09.935	info	WebSocket manager initialized with	{"workerCount": 40, "worker goroutines and %d connection buckets": 32}
+2025-08-28 16:39:09.945	info	run connector	{"serverId": "connector-001"}
+2025-08-28 16:39:09.945	info	WebSocket manager started with	{"workerCount": 40, "worker goroutines and connection buckets": 32}
+2025-08-28 16:40:09.946	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 16:41:09.946	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 16:42:09.945	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 16:43:09.946	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 16:44:09.945	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 16:45:09.945	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 16:46:09.946	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 16:47:09.945	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 16:48:09.946	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 16:49:09.946	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 16:50:09.946	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 16:51:09.946	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 16:52:09.946	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 16:53:09.946	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 16:54:09.945	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 16:55:09.946	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 16:56:09.946	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 16:57:09.946	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 16:58:09.945	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 16:59:09.945	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:00:09.946	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:01:09.946	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:02:09.945	info	Performance stats	{"connections": 0, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 9}
+2025-08-28 17:02:20.622	info	Closed	{"len(clients)": 0, "connections in bucket": 19}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 5}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 2}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 31}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 3}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 0}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 1}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 10}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 4}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 11}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 7}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 26}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 8}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 6}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 22}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 23}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 28}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 24}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 16}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 29}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 25}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 14}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 27}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 13}
+2025-08-28 17:02:20.622	info	Closed	{"len(clients)": 0, "connections in bucket": 17}
+2025-08-28 17:02:20.622	info	Closed	{"len(clients)": 0, "connections in bucket": 15}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 18}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 30}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 12}
+2025-08-28 17:02:20.622	info	Closed	{"len(clients)": 0, "connections in bucket": 20}
+2025-08-28 17:02:20.621	info	Closed	{"len(clients)": 0, "connections in bucket": 21}
+2025-08-28 17:02:20.623	info	All connections closed
+2025-08-28 17:02:41.499	info	WebSocket manager initialized with	{"workerCount": 40, "worker goroutines and %d connection buckets": 32}
+2025-08-28 17:02:41.513	info	run connector	{"serverId": "connector-001"}
+2025-08-28 17:02:41.513	info	WebSocket manager started with	{"workerCount": 40, "worker goroutines and connection buckets": 32}
+2025-08-28 17:03:41.513	info	Performance stats	{"connections": 1, "messages_processed": 3, "avg_processing_time": 859928, "errors": 3}
+2025-08-28 17:04:11.039	info	readMessage stopped	{"client:": "f1fc2cec-fd4d-4958-b0e3-0763ec237376-connector-001-10001"}
+2025-08-28 17:04:11.039	info	writeMessage stopped	{"client:": "f1fc2cec-fd4d-4958-b0e3-0763ec237376-connector-001-10001"}
+2025-08-28 17:04:11.039	info	client connection closed	{"cid:": "f1fc2cec-fd4d-4958-b0e3-0763ec237376-connector-001-10001"}
+2025-08-28 17:04:33.237	info	readMessage stopped	{"client:": "be272740-cdaf-4b34-b440-d3a4674655b3-connector-001-10002"}
+2025-08-28 17:04:33.237	info	writeMessage stopped	{"client:": "be272740-cdaf-4b34-b440-d3a4674655b3-connector-001-10002"}
+2025-08-28 17:04:33.237	info	client connection closed	{"cid:": "be272740-cdaf-4b34-b440-d3a4674655b3-connector-001-10002"}
+2025-08-28 17:04:42.089	info	Performance stats	{"connections": 1, "messages_processed": 6, "avg_processing_time": 2945006, "errors": 6}
+2025-08-28 17:05:28.955	info	readMessage stopped	{"client:": "8639c695-4649-4f98-8471-e7eee28d1f5d-connector-001-10003"}
+2025-08-28 17:05:28.955	info	client connection closed	{"cid:": "8639c695-4649-4f98-8471-e7eee28d1f5d-connector-001-10003"}
+2025-08-28 17:05:28.956	info	writeMessage stopped	{"client:": "8639c695-4649-4f98-8471-e7eee28d1f5d-connector-001-10003"}
+2025-08-28 17:05:41.513	info	Performance stats	{"connections": 0, "messages_processed": 8, "avg_processing_time": 3531725, "errors": 6}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 4}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 7}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 31}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 1}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 2}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 3}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 5}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 18}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 19}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 0}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 25}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 26}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 27}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 28}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 6}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 22}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 23}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 13}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 9}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 12}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 14}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 21}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 20}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 10}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 15}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 30}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 8}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 11}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 24}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 29}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 17}
+2025-08-28 17:05:48.070	info	Closed	{"len(clients)": 0, "connections in bucket": 16}
+2025-08-28 17:05:48.072	info	All connections closed
+2025-08-28 17:05:51.072	info	stop app finish
+2025-08-28 17:05:51.072	info	connector app quit
+2025-08-28 17:05:54.760	info	WebSocket manager initialized with	{"workerCount": 40, "worker goroutines and %d connection buckets": 32}
+2025-08-28 17:05:54.771	info	run connector	{"serverId": "connector-001"}
+2025-08-28 17:05:54.771	info	WebSocket manager started with	{"workerCount": 40, "worker goroutines and connection buckets": 32}
+2025-08-28 17:06:54.771	info	Performance stats	{"connections": 1, "messages_processed": 1, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:07:52.241	info	readMessage stopped	{"client:": "cbad737c-8ba3-4199-8a02-32ec4f052214-connector-001-10001"}
+2025-08-28 17:07:52.241	info	client connection closed	{"cid:": "cbad737c-8ba3-4199-8a02-32ec4f052214-connector-001-10001"}
+2025-08-28 17:07:52.243	info	writeMessage stopped	{"client:": "cbad737c-8ba3-4199-8a02-32ec4f052214-connector-001-10001"}
+2025-08-28 17:07:54.772	info	Performance stats	{"connections": 0, "messages_processed": 2, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:08:54.771	info	Performance stats	{"connections": 0, "messages_processed": 2, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:09:54.772	info	Performance stats	{"connections": 0, "messages_processed": 2, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:10:54.772	info	Performance stats	{"connections": 0, "messages_processed": 2, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:11:54.772	info	Performance stats	{"connections": 0, "messages_processed": 2, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:12:54.771	info	Performance stats	{"connections": 0, "messages_processed": 2, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:13:54.771	info	Performance stats	{"connections": 0, "messages_processed": 2, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:14:54.771	info	Performance stats	{"connections": 0, "messages_processed": 2, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:15:54.772	info	Performance stats	{"connections": 0, "messages_processed": 2, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:16:54.772	info	Performance stats	{"connections": 0, "messages_processed": 2, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:17:54.772	info	Performance stats	{"connections": 0, "messages_processed": 2, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:18:54.771	info	Performance stats	{"connections": 0, "messages_processed": 2, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:19:54.772	info	Performance stats	{"connections": 0, "messages_processed": 2, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 2}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 31}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 0}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 3}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 18}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 17}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 11}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 10}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 12}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 7}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 6}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 1}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 13}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 8}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 4}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 14}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 25}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 9}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 15}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 5}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 22}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 20}
+2025-08-28 17:20:51.508	info	Closed	{"len(clients)": 0, "connections in bucket": 19}
+2025-08-28 17:20:51.509	info	Closed	{"len(clients)": 0, "connections in bucket": 21}
+2025-08-28 17:20:51.509	info	Closed	{"len(clients)": 0, "connections in bucket": 26}
+2025-08-28 17:20:51.509	info	Closed	{"len(clients)": 0, "connections in bucket": 29}
+2025-08-28 17:20:51.509	info	Closed	{"len(clients)": 0, "connections in bucket": 30}
+2025-08-28 17:20:51.509	info	Closed	{"len(clients)": 0, "connections in bucket": 27}
+2025-08-28 17:20:51.509	info	Closed	{"len(clients)": 0, "connections in bucket": 16}
+2025-08-28 17:20:51.509	info	Closed	{"len(clients)": 0, "connections in bucket": 23}
+2025-08-28 17:20:51.509	info	Closed	{"len(clients)": 0, "connections in bucket": 24}
+2025-08-28 17:20:51.509	info	Closed	{"len(clients)": 0, "connections in bucket": 28}
+2025-08-28 17:20:51.510	info	All connections closed
+2025-08-28 17:20:56.454	info	WebSocket manager initialized with	{"workerCount": 40, "worker goroutines and %d connection buckets": 32}
+2025-08-28 17:20:56.463	info	run connector	{"serverId": "connector-001"}
+2025-08-28 17:20:56.463	info	WebSocket manager started with	{"workerCount": 40, "worker goroutines and connection buckets": 32}
+2025-08-28 17:21:56.463	info	Performance stats	{"connections": 4, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:22:56.187	info	WebSocket manager initialized with	{"workerCount": 40, "worker goroutines and %d connection buckets": 32}
+2025-08-28 17:22:56.197	info	run connector	{"serverId": "connector-001"}
+2025-08-28 17:22:56.197	info	WebSocket manager started with	{"workerCount": 40, "worker goroutines and connection buckets": 32}
+2025-08-28 17:23:49.776	info	WebSocket manager initialized with	{"workerCount": 40, "worker goroutines and %d connection buckets": 32}
+2025-08-28 17:23:49.787	info	run connector	{"serverId": "connector-001"}
+2025-08-28 17:23:49.787	info	WebSocket manager started with	{"workerCount": 40, "worker goroutines and connection buckets": 32}
+2025-08-28 17:23:53.567	info	readMessage stopped	{"client:": "c8bf55a9-6a26-4faa-a6e6-752b9519c2e0-connector-001-10001"}
+2025-08-28 17:23:53.567	info	client connection closed	{"cid:": "c8bf55a9-6a26-4faa-a6e6-752b9519c2e0-connector-001-10001"}
+2025-08-28 17:23:53.567	info	writeMessage stopped	{"client:": "c8bf55a9-6a26-4faa-a6e6-752b9519c2e0-connector-001-10001"}
+2025-08-28 17:26:05.638	info	WebSocket manager initialized with	{"workerCount": 40, "worker goroutines and %d connection buckets": 32}
+2025-08-28 17:26:05.648	info	run connector	{"serverId": "connector-001"}
+2025-08-28 17:26:05.648	info	WebSocket manager started with	{"workerCount": 40, "worker goroutines and connection buckets": 32}
+2025-08-28 17:27:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:28:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:29:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:30:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:31:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:32:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:33:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:34:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:35:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:36:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:37:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:38:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:39:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:40:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:41:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:42:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:43:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:44:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:45:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:46:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:47:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:48:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:49:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:50:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:51:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:52:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:53:05.648	info	Performance stats	{"connections": 1, "messages_processed": 0, "avg_processing_time": 0, "errors": 0}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 1}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 27}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 4}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 2}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 0}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 3}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 28}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 25}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 21}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 31}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 26}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 15}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 16}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 17}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 29}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 10}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 19}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 11}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 9}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 20}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 30}
+2025-08-28 17:53:12.001	info	writeMessage stopped	{"client:": "4ab1645a-b352-4036-9e5f-ac0014d3b3b5-connector-001-10001"}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 5}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 22}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 13}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 23}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 7}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 24}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 6}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 12}
+2025-08-28 17:53:12.002	info	readMessage stopped	{"client:": "4ab1645a-b352-4036-9e5f-ac0014d3b3b5-connector-001-10001"}
+2025-08-28 17:53:12.002	info	client connection closed	{"cid:": "4ab1645a-b352-4036-9e5f-ac0014d3b3b5-connector-001-10001"}
+2025-08-28 17:53:12.001	info	Closed	{"len(clients)": 0, "connections in bucket": 8}
+2025-08-28 17:53:12.002	info	Closed	{"len(clients)": 0, "connections in bucket": 14}
+2025-08-28 17:53:12.004	info	Closed	{"len(clients)": 1, "connections in bucket": 18}
+2025-08-28 17:53:12.004	info	All connections closed
+2025-08-28 17:53:15.004	info	stop app finish
+2025-08-28 17:53:15.005	info	connector app quit

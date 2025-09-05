@@ -24,7 +24,6 @@ var (
 	poolOnce               sync.Once
 )
 
-// GetWsConnectionPool 获取全局连接池实例
 func GetWsConnectionPool() *WsConnectionPool {
 	poolOnce.Do(func() {
 		globalWsConnectionPool = NewWsConnectionPool(10000) // 默认最大池大小为10000
@@ -50,17 +49,21 @@ func NewWsConnectionPool(maxSize int32) *WsConnectionPool {
 	return p
 }
 
+// Get 从连接池中获取一个连接
 func (w *WsConnectionPool) Get(conn *websocket.Conn, manager *Manager) *WsConnection {
 	wsConn := w.pool.Get().(*WsConnection)
 	atomic.AddInt64(&w.reused, 1)
 
 	// 初始化连接对象
+	// 连接客户端id,可根据需要自定义
 	cid := fmt.Sprintf("%s-%s-%d", uuid.New().String(), manager.ServerId, atomic.AddUint64(&cidBase, 1))
 
 	wsConn.Conn = conn
 	wsConn.manager = manager
 	wsConn.Cid = cid
 	wsConn.WriteChan = make(chan []byte, 1024)
+
+	// 将wsConn中的ReadChan汇总到manager.ClientReadChan中
 	wsConn.ReadChan = manager.ClientReadChan
 	wsConn.Session = NewSession(cid, manager)
 	wsConn.closeChan = make(chan struct{})
@@ -73,6 +76,7 @@ func (w *WsConnectionPool) Get(conn *websocket.Conn, manager *Manager) *WsConnec
 	return wsConn
 }
 
+// Put 将对象设置到连接池中
 func (w *WsConnectionPool) Put(wsConn *WsConnection) {
 	if wsConn == nil {
 		return
