@@ -18,15 +18,15 @@ var (
 )
 
 type WsConnection struct {
-	Cid           string // 客户端唯一标识
-	Conn          *websocket.Conn
-	manager       *Manager
-	ReadChan      chan *MsgPack // 消息类型可根据不同需求自定义
-	WriteChan     chan []byte
-	Session       *Session
-	pingTicker    *time.Ticker
-	closeChan     chan struct{}
-	closeOnce     sync.Once
+	Cid           string          // 客户端唯一标识
+	Conn          *websocket.Conn // websocket 的连接对象
+	manager       *Manager        // ws管理器
+	ReadChan      chan *MsgPack   //  读出的消息传给业务层
+	WriteChan     chan []byte     // 业务层写入消息，通过它推送给客户端
+	Session       *Session        // 会话对象，存放用户相关数据
+	pingTicker    *time.Ticker    // 定时发送 ping
+	closeChan     chan struct{}   // 通知协程退出
+	closeOnce     sync.Once       // 确保 Close() 只执行一次
 	readChanOnce  sync.Once
 	writeChanOnce sync.Once
 }
@@ -46,8 +46,8 @@ func (w *WsConnection) SendMessage(buf []byte) error {
 }
 
 func (w *WsConnection) Close() {
+	// 只执行一次不用检查是否关闭
 	w.closeOnce.Do(func() {
-		// 只执行一次不用检查是否关闭
 		close(w.closeChan)
 
 		if w.Conn != nil {
@@ -81,6 +81,13 @@ func (w *WsConnection) Run() {
 
 	// 做一些心跳检测 websocket中 ping pong机制
 	w.Conn.SetPongHandler(w.PongHandler)
+
+	// 设置关闭连接处理器
+	if w.manager.ConnCloseHandler != nil {
+		w.Conn.SetCloseHandler(func(code int, text string) error {
+			return w.manager.ConnCloseHandler(w, code, text)
+		})
+	}
 }
 
 // writeMessage 写数据
@@ -177,7 +184,10 @@ func (w *WsConnection) readMessage() {
 	}
 }
 
-// PongHandler ping处理器
+// PongHandler 心跳处理
+// 检测心跳一般有两种方式 一种是应用层心跳：客户端/服务端主动发送 ping/pong 消息。
+// 另外一种是利用底层超时机制：给连接设置 读/写超时时间，如果超过某个时间没有收到数据，就认为连接断开
+// 收到 pong 后刷新超时
 func (w *WsConnection) PongHandler(data string) error {
 	if err := w.Conn.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
 		return err

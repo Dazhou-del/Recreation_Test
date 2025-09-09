@@ -6,6 +6,7 @@ import (
 	"framework/game"
 	"framework/net"
 	"go.uber.org/zap"
+	"net/http"
 )
 
 type Connector struct {
@@ -24,7 +25,9 @@ func (c *Connector) Run(serverId string, maxConn int) {
 	if !c.isRunning {
 		//启动websocket和nats
 		c.wsManager = net.NewManager(maxConn)
+		c.wsManager.CheckTokenHandler = c.checkTokenHandler
 		c.wsManager.ConnectorHandlers = c.handlers
+		c.wsManager.ConnCloseHandler = c.connCloseHandler
 		c.Serve(serverId)
 	}
 }
@@ -51,4 +54,15 @@ func (c *Connector) Serve(serverId string) {
 
 func (c *Connector) RegisterHandler(handlers net.LogicHandler) {
 	c.handlers = handlers
+}
+
+func (c *Connector) checkTokenHandler(r *http.Request) bool {
+	logs.Log.Info("checkTokenHandler")
+	return true
+}
+
+func (c *Connector) connCloseHandler(*net.WsConnection, int, string) error {
+	logs.Log.Info("conn close")
+
+	return nil
 }

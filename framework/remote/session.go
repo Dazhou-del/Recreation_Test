@@ -33,22 +33,19 @@ func NewSession(client Client, msg *stream.Msg) *Session {
 }
 
 func (s *Session) pushSessionChanRead() {
-	for {
-		select {
-		case data := <-s.pushSessionChan:
-			msg := stream.Msg{
-				Dst:         s.msg.Src,
-				Src:         s.msg.Dst,
-				Cid:         s.msg.Cid,
-				Uid:         s.msg.Uid,
-				SessionData: data,
-				SessionType: stream.Session,
-			}
+	for data := range s.pushSessionChan {
+		msg := stream.Msg{
+			Dst:         s.msg.Src,
+			Src:         s.msg.Dst,
+			Cid:         s.msg.Cid,
+			Uid:         s.msg.Uid,
+			SessionData: data,
+			SessionType: stream.Session,
+		}
 
-			res, _ := json.Marshal(msg)
-			if err := s.client.SendMsg(s.msg.Dst, res); err != nil {
-				logs.Log.Error("push session data err", zap.Error(err))
-			}
+		res, _ := json.Marshal(msg)
+		if err := s.client.SendMsg(s.msg.Dst, res); err != nil {
+			logs.Log.Error("push session data err", zap.Error(err))
 		}
 	}
 }

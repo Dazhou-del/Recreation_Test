@@ -22,7 +22,7 @@ var (
 	websocketUpgrade = websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
 			return true
-		},
+		}, // 允许所有跨越
 		ReadBufferSize:    4096, // 增加缓冲区大小
 		WriteBufferSize:   4096, // 增加缓冲区大小
 		EnableCompression: true, // 启用压缩
@@ -36,9 +36,11 @@ type Manager struct {
 	dataLock           sync.RWMutex // 仅用于保护data字段
 	websocketUpgrade   *websocket.Upgrader
 	ServerId           string
-	CheckOriginHandler CheckOriginHandler
+	CheckOriginHandler handleRequestFunc
+	CheckTokenHandler  handleRequestFunc
+	ConnCloseHandler   handleCloseFunc
 
-	// 分片存储客户端连接，使用分片锁
+	// 分片存储客户端连接，使用分片锁,减少锁冲突
 	clientBuckets []*ClientBucket
 	bucketMask    uint32
 
@@ -47,9 +49,8 @@ type Manager struct {
 	clientWorkers  []chan *MsgPack // 工作协程池
 	workerCount    int             // 工作协程数量
 
-	//handlers          map[protocol.PackageType]EventHandler
-	handlers          map[string]EventHandler
-	ConnectorHandlers LogicHandler
+	handlers          map[string]EventHandler // 消息类型 -> 处理器
+	ConnectorHandlers LogicHandler            // 自定义业务逻辑处理器
 
 	// 共享数据
 	data map[string]any
@@ -60,10 +61,10 @@ type Manager struct {
 
 	// 性能统计
 	stats struct {
-		messageProcessed   int64
-		messageErrors      int64
-		avgProcessingTime  int64
-		currentConnections int32
+		messageProcessed   int64 // 处理的消息数
+		messageErrors      int64 // 错误数
+		avgProcessingTime  int64 // 平均处理时间（微秒）
+		currentConnections int32 // 当前连接数
 	}
 
 	// 负载均衡状态,只有客户端与ws服务端这层则无需配置
@@ -106,6 +107,9 @@ func NewManager(maxConn int) *Manager {
 			roundRobinIdx: make(map[string]int),
 			hashRing:      make(map[string]*consistentHash),
 			serverLoads:   make(map[string]int),
+		},
+		CheckTokenHandler: func(r *http.Request) bool {
+			return true
 		},
 	}
 
@@ -167,13 +171,13 @@ func (m *Manager) Close() {
 	logs.Log.Info("All connections closed")
 }
 
-type CheckOriginHandler func(r *http.Request) bool
+type handleRequestFunc func(r *http.Request) bool
 type HandlerFunc func(session *Session, body []byte) (any, error)
 type LogicHandler map[string]HandlerFunc
 type EventHandler func(packet *protocol.Packet, c Connection) error
+type handleCloseFunc func(*WsConnection, int, string) error
 
 func (m *Manager) Run(addr string) {
-	// 启动工作协程池
 	for i := 0; i < m.workerCount; i++ {
 		go m.clientWorkerRoutine(i)
 	}
@@ -194,6 +198,7 @@ func (m *Manager) Run(addr string) {
 	logs.Log.Fatal("connector listen serve ", zap.Error(http.ListenAndServe(addr, nil)))
 }
 
+// clientWorkerRoutine 启动工作协程池
 func (m *Manager) clientWorkerRoutine(workerID int) {
 	for msg := range m.clientWorkers[workerID] {
 		startTime := time.Now()
@@ -246,6 +251,7 @@ func (m *Manager) routeEvent(packet *protocol.Packet, cid string) error {
 	return handler(packet, conn)
 }
 
+// clientReadChanHandler 客户端消息分发器
 func (m *Manager) clientReadChanHandler() {
 	for body := range m.ClientReadChan {
 		// 根据连接ID分配到特定工作协程
@@ -263,6 +269,7 @@ func (m *Manager) clientReadChanHandler() {
 	}
 }
 
+// setSessionData 设置session数据
 func (m *Manager) setSessionData(msg stream.Msg) {
 	if msg.SessionData == nil {
 		return
@@ -319,65 +326,6 @@ func (m *Manager) setSessionData(msg stream.Msg) {
 	}
 }
 
-// removeClient 从管理器中删除一个客户端
-func (m *Manager) removeClient(wc *WsConnection) {
-	bucket := m.getBucket(wc.Cid)
-
-	bucket.Lock()
-	if _, exists := bucket.clients[wc.Cid]; exists {
-		// 先从map中删除，避免其他地方再次访问
-		delete(bucket.clients, wc.Cid)
-		bucket.Unlock()
-
-		// 关闭连接
-		wc.Close()
-
-		// 释放连接槽位
-		<-m.connSemaphore
-
-		// 更新统计信息
-		atomic.AddInt32(&m.stats.currentConnections, -1)
-	} else {
-		bucket.Unlock()
-	}
-}
-
-// getBucket 获取连接所在的分片
-func (m *Manager) getBucket(cid string) *ClientBucket {
-	hash := fnv32(cid)
-	index := hash & m.bucketMask
-	return m.clientBuckets[index]
-}
-
-// addClient 添加连接
-func (m *Manager) addClient(client *WsConnection) {
-	// 使用分片锁
-	bucket := m.getBucket(client.Cid)
-
-	select {
-	case m.connSemaphore <- struct{}{}:
-		// 允许新连接
-		bucket.Lock()
-		bucket.clients[client.Cid] = client
-		bucket.Unlock()
-
-		// 设置会话数据
-		m.dataLock.RLock()
-		client.GetSession().SetAll(m.data)
-		m.dataLock.RUnlock()
-		// 更新统计信息
-		atomic.AddInt32(&m.stats.currentConnections, 1)
-
-		return
-	default:
-		// 连接数已达上限
-		logs.Log.Warn("Connection limit reached, rejecting new connection")
-		client.Close()
-
-		return
-	}
-}
-
 // 用于计算哈希值的辅助函数
 func fnv32(key string) uint32 {
 	h := fnv.New32a()
@@ -413,6 +361,14 @@ func (m *Manager) serveWS(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Server is at capacity", http.StatusServiceUnavailable)
 		logs.Log.Warn("Connection limit reached, rejecting connection from", zap.Any("remoteAddr", r.RemoteAddr))
 
+		return
+	}
+
+	// 检查连接是否合法
+	if !m.CheckTokenHandler(r) {
+		http.Error(w, "Server is at capacity", http.StatusUnauthorized)
+
+		logs.Log.Warn("Connection limit reached, rejecting connection from", zap.Any("remoteAddr", r.RemoteAddr))
 		return
 	}
 
@@ -486,33 +442,76 @@ func (m *Manager) MessageHandler(packet *protocol.Packet, c Connection) error {
 	return c.SendMessage(res)
 }
 
+// GetConnectionCount 获取当前连接数量
+func (m *Manager) GetConnectionCount() int {
+	return int(atomic.LoadInt32(&m.stats.currentConnections))
+}
+
+// removeClient 从管理器中删除一个客户端
+func (m *Manager) removeClient(wc *WsConnection) {
+	bucket := m.getBucket(wc.Cid)
+
+	bucket.Lock()
+	if _, exists := bucket.clients[wc.Cid]; exists {
+		// 先从map中删除，避免其他地方再次访问
+		delete(bucket.clients, wc.Cid)
+		bucket.Unlock()
+
+		// 关闭连接
+		wc.Close()
+
+		// 释放连接槽位
+		<-m.connSemaphore
+
+		// 更新统计信息
+		atomic.AddInt32(&m.stats.currentConnections, -1)
+	} else {
+		bucket.Unlock()
+	}
+}
+
+// getBucket 获取连接所在的分片
+func (m *Manager) getBucket(cid string) *ClientBucket {
+	hash := fnv32(cid)
+	index := hash & m.bucketMask
+	return m.clientBuckets[index]
+}
+
+// addClient 添加连接
+func (m *Manager) addClient(client *WsConnection) {
+	// 使用分片锁
+	bucket := m.getBucket(client.Cid)
+
+	select {
+	case m.connSemaphore <- struct{}{}:
+		// 允许新连接
+		bucket.Lock()
+		bucket.clients[client.Cid] = client
+		bucket.Unlock()
+
+		// 设置会话数据
+		m.dataLock.RLock()
+		client.GetSession().SetAll(m.data)
+		m.dataLock.RUnlock()
+		// 更新统计信息
+		atomic.AddInt32(&m.stats.currentConnections, 1)
+
+		return
+	default:
+		// 连接数已达上限
+		logs.Log.Warn("Connection limit reached, rejecting new connection")
+		client.Close()
+
+		return
+	}
+}
+
 // UpdateServerLoad 更新服务器负载
 func (m *Manager) UpdateServerLoad(serverID string, load int) {
 	m.lbState.mu.Lock()
 	defer m.lbState.mu.Unlock()
 
 	m.lbState.serverLoads[serverID] = load
-}
-
-// GetAllClients 获取所有客户端连接
-func (m *Manager) GetAllClients() map[string]Connection {
-	result := make(map[string]Connection)
-
-	// 从所有分片中收集客户端
-	for _, bucket := range m.clientBuckets {
-		bucket.RLock()
-		for cid, conn := range bucket.clients {
-			result[cid] = conn
-		}
-		bucket.RUnlock()
-	}
-
-	return result
-}
-
-// GetConnectionCount 获取当前连接数量
-func (m *Manager) GetConnectionCount() int {
-	return int(atomic.LoadInt32(&m.stats.currentConnections))
 }
 
 // GetStats 获取性能统计信息
@@ -565,6 +564,22 @@ func (m *Manager) FindClientByUID(uid string) Connection {
 	}
 
 	return nil
+}
+
+// GetAllClients 获取所有客户端连接
+func (m *Manager) GetAllClients() map[string]Connection {
+	result := make(map[string]Connection)
+
+	// 从所有分片中收集客户端
+	for _, bucket := range m.clientBuckets {
+		bucket.RLock()
+		for cid, conn := range bucket.clients {
+			result[cid] = conn
+		}
+		bucket.RUnlock()
+	}
+
+	return result
 }
 
 // SetConnectionRateLimit 设置连接速率限制
